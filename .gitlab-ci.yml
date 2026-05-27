@@ -1,0 +1,103 @@
+# CI for propeller-v2-core-ui.
+#
+# Two stages:
+#
+#   verify  — the package's own checks. Fast, no external dependencies:
+#             typecheck (tsc), the Vitest unit suite, and a build.
+#
+#   mirror  — one-way mirror of develop/master to the public GitHub repo
+#             so the package can be consumed via a `github:` dependency URL.
+#
+# This package has no app of its own and no consumer to e2e against — its
+# consumers are propeller-v2-vue-ui and propeller-v2-react-ui, which run their
+# own downstream-e2e gates. So no `downstream` stage here.
+#
+# Required GitLab CI/CD variables (Settings → CI/CD → Variables). Mark
+# secrets "Masked" and "Protected":
+#
+#   GITHUB_TOKEN  repo-scoped token for the mirror job.
+
+stages:
+  - verify
+  - mirror
+
+default:
+  image: node:20
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+
+.npm_setup: &npm_setup
+  - npm config set cache .npm --location project
+  - npm ci
+
+# ── Stage: verify ───────────────────────────────────────────────────────────
+
+typecheck:
+  stage: verify
+  before_script: *npm_setup
+  script:
+    - npm run typecheck
+
+unit-tests:
+  stage: verify
+  before_script: *npm_setup
+  script:
+    - npm run test:coverage
+  coverage: '/Statements\s*:\s*([0-9.]+)%/'
+  artifacts:
+    when: always
+    paths:
+      - coverage/
+    expire_in: 1 week
+
+build:
+  stage: verify
+  before_script: *npm_setup
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 day
+
+# ── Stage: mirror ───────────────────────────────────────────────────────────
+# One-way mirror of develop/master to the public GitHub repo so the package
+# can be consumed via a `github:` dependency URL.
+#
+# Runs last, after verify — `when: on_success` (the default) means GitHub
+# only ever receives commits that passed verify.
+#
+# Requires CI/CD variable GITHUB_TOKEN (repo scope), marked Masked + Protected.
+
+mirror_to_github:
+  stage: mirror
+  image:
+    name: alpine/git:latest
+    entrypoint: [""]
+  only:
+    - develop
+    - master
+    - main
+  before_script:
+    - git --version
+  script:
+    - echo "Mirroring to GitHub..."
+    - git config --global user.email "ci@propeller-commerce.com"
+    - git config --global user.name "GitLab CI"
+    - git remote add github https://${GITHUB_TOKEN}@github.com/propeller-commerce/propeller-v2-core-ui.git || true
+    # GitLab clones shallow; a shallow history + thin pack against the
+    # divergent GitHub mirror causes "remote unpack failed: index-pack
+    # failed". Unshallow so the full object graph is local, do NOT fetch the
+    # GitHub remote, and push a complete (--no-thin) pack.
+    - git fetch origin --unshallow || git fetch origin || true
+    # Always push to GitHub's master branch, regardless of which GitLab
+    # branch triggered the pipeline.
+    - git push --no-thin github HEAD:refs/heads/master --force
+    - git push --no-thin github --tags --force
+  when: on_success
+  allow_failure: false
