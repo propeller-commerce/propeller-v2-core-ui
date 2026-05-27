@@ -21,7 +21,7 @@ export function attributeNameMatches(
   const desc = attr.attributeDescription;
   if (!desc) return false;
   if (desc.name === targetName) return true;
-  if (desc.descriptions?.some((d: any) => d.value === targetName)) return true;
+  if (desc.descriptions?.some((d: { value?: string }) => d.value === targetName)) return true;
   return false;
 }
 
@@ -38,7 +38,9 @@ export function getAttributeDisplayName(
 
   if (language && desc.descriptions?.length) {
     const lang = language.toUpperCase();
-    const match = desc.descriptions.find((d: any) => d.language?.toUpperCase() === lang);
+    const match = desc.descriptions.find(
+      (d: { language?: string; value?: string }) => d.language?.toUpperCase() === lang,
+    );
     if (match?.value) return match.value;
   }
 
@@ -53,11 +55,37 @@ export function getAttributeDisplayName(
  * - Current SDK (type-based): `COLOR | TEXT | DECIMAL | INT | ENUM`
  * - Fallback: string coercion + object property mining
  */
+/**
+ * Loose structural type for `attr.value`. The SDK doesn't model the
+ * legacy + type-based + fallback variants as a single discriminated union,
+ * so every reachable property is declared optional here. Narrowing happens
+ * at use-sites via the same checks the original code used.
+ */
+type AttributeValueShape = {
+  colorValue?: string;
+  textValues?: Array<{ values?: unknown }>;
+  textValue?: string;
+  numericValue?: number;
+  booleanValue?: boolean;
+  type?: AttributeType;
+  value?: { textValues?: Array<{ values?: unknown }> } | string;
+  values?: unknown[];
+};
+
 export function extractAttributeValues(attr: AttributeResult): string[] {
   const values: string[] = [];
-  const v = attr.value as any;
+  const raw = attr.value as AttributeValueShape | string | null | undefined;
 
-  if (!v) return values;
+  if (!raw) return values;
+
+  // String values are an SDK fallback shape — handle them up front so the
+  // remaining branches can work against the structured `AttributeValueShape`.
+  if (typeof raw === 'string') {
+    values.push(raw);
+    return values;
+  }
+
+  const v = raw;
 
   // ── Legacy SDK format ────────────────────────────────────────────────────
   if (v.colorValue) {
@@ -82,10 +110,13 @@ export function extractAttributeValues(attr: AttributeResult): string[] {
 
   // ── Current SDK format (type-based) ─────────────────────────────────────
   else if (v.type === AttributeType.COLOR) {
-    if (v.value) values.push(v.value);
+    if (typeof v.value === 'string' && v.value) values.push(v.value);
   } else if (v.type === AttributeType.TEXT) {
     // Same first-non-empty pick as the legacy branch above.
-    const buckets = (v.value?.textValues ?? []) as Array<{ values?: unknown }>;
+    const buckets =
+      v.value && typeof v.value === 'object'
+        ? ((v.value.textValues ?? []) as Array<{ values?: unknown }>)
+        : [];
     const firstNonEmpty = buckets.find(
       (entry) => Array.isArray(entry?.values) && entry.values.length > 0,
     );
@@ -96,18 +127,16 @@ export function extractAttributeValues(attr: AttributeResult): string[] {
   } else if (v.type === AttributeType.INT) {
     if (v.value !== undefined) values.push(String(v.value));
   } else if (v.type === AttributeType.ENUM) {
-    if (v.value) values.push(v.value);
+    if (typeof v.value === 'string' && v.value) values.push(v.value);
   }
 
   // ── Fallback ──────────────────────────────────────────────────────────────
-  else if (typeof v === 'string') {
-    values.push(v);
-  } else if (typeof v === 'object') {
+  else if (typeof v === 'object') {
     if (Array.isArray(v.values)) {
-      return (v.values as any[]).filter((x) => typeof x === 'string');
+      return (v.values as unknown[]).filter((x): x is string => typeof x === 'string');
     }
-    const strVals = Object.values(v).filter((x) => typeof x === 'string');
-    return strVals as string[];
+    const strVals = Object.values(v).filter((x): x is string => typeof x === 'string');
+    return strVals;
   }
 
   return values.filter(Boolean);

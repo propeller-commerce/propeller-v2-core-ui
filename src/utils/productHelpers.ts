@@ -18,9 +18,9 @@ export function getClusterSku(cluster: Cluster | null | undefined): string {
 }
 
 export function getLocalizedValue(
-  items: Array<{ language?: string; value?: string }> | null | undefined,
+  items: Array<{ language: string; value?: string }> | null | undefined,
   language?: string,
-  fallback = ''
+  fallback = '',
 ): string {
-  return getLanguageString(items as any, language || 'NL', fallback);
+  return getLanguageString(items, language || 'NL', fallback);
 }
