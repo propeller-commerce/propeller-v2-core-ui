@@ -26,7 +26,7 @@ export interface ProductSearchFilters {
 export interface ProductInfoOptions {
   graphqlClient: GraphQLClient;
   language?: string;
-  configuration?: unknown;
+  configuration?: any;
 }
 
 export interface AttributeValueResult {

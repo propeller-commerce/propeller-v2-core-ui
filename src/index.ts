@@ -29,7 +29,7 @@ export {
   resolveLanguageEntry,
   getLanguageString,
   getLanguageUri,
-  type LocalizedLike,
+  type LocalizedEntry,
 } from './utils/languageResolver';
 export {
   getProductImageUrl,

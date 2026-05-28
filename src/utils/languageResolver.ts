@@ -1,27 +1,24 @@
 /**
  * languageResolver — Resolve localised string/value from SDK objects.
  *
- * Framework-agnostic. Generic over any SDK-shaped object that carries a
- * `language` field — `LocalizedString`, `LocalizedVideo`, `LocalizedSlug`,
- * etc. The host's per-call `T` carries the rest of the shape (`value`,
- * `uri`, …), so we don't redeclare a parallel `LocalizedEntry` here.
+ * Framework-agnostic. Works with any object that has a `language` field
+ * and a `value` field (or `uri`, `name`, etc).
  */
 
-/**
- * Structural constraint shared by every SDK "localized X" type: a non-empty
- * language code. The SDK declares `language: string` (required) on
- * `LocalizedString`, `LocalizedVideo`, `LocalizedSlug` and friends — this
- * matches them without importing each one explicitly.
- */
-export type LocalizedLike = { language: string };
+export interface LocalizedEntry {
+  language?: string;
+  value?: string;
+  [key: string]: any;
+}
 
 /**
  * Finds the best matching entry for a given language, with fallback to the
  * first entry in the array.
  */
-export function resolveLanguageEntry<T extends LocalizedLike>(
-  items: readonly T[] | null | undefined,
+export function resolveLanguageEntry<T extends LocalizedEntry>(
+  items: T[] | null | undefined,
   language: string,
+  fallback?: string
 ): T | undefined {
   if (!items || items.length === 0) return undefined;
   const lang = language.toUpperCase();
@@ -29,24 +26,26 @@ export function resolveLanguageEntry<T extends LocalizedLike>(
 }
 
 /**
- * Resolves a localised string value from an array of `LocalizedString`-shaped
- * objects. Returns the `value` field of the matching entry, or fallback.
+ * Resolves a localised string value from an array of LocalizedString objects.
+ * Returns the `value` field of the matching entry, or fallback.
  */
-export function getLanguageString<T extends LocalizedLike & { value?: string }>(
-  items: readonly T[] | null | undefined,
+export function getLanguageString(
+  items: LocalizedEntry[] | null | undefined,
   language: string,
-  fallback = '',
+  fallback = ''
 ): string {
-  return resolveLanguageEntry(items, language)?.value ?? fallback;
+  const entry = resolveLanguageEntry(items, language);
+  return entry?.value ?? fallback;
 }
 
 /**
- * Resolves a URI from an array of `LocalizedVideo`-shaped objects.
+ * Resolves a URI from an array of objects with `language` and `uri` fields.
  */
-export function getLanguageUri<T extends LocalizedLike & { uri?: string }>(
-  items: readonly T[] | null | undefined,
+export function getLanguageUri(
+  items: (LocalizedEntry & { uri?: string })[] | null | undefined,
   language: string,
-  fallback = '',
+  fallback = ''
 ): string {
-  return resolveLanguageEntry(items, language)?.uri ?? fallback;
+  const entry = resolveLanguageEntry(items, language);
+  return entry?.uri ?? fallback;
 }
