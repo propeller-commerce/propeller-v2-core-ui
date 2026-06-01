@@ -59,6 +59,17 @@ export {
   safeJsonStringify,
   type JsonLdContext,
 } from './utils/jsonLd';
+export { deriveUserMode, type ShopMode, type UserMode } from './utils/userMode';
+
+// ── CMS adapter contract ────────────────────────────────────────────────────
+export type {
+  CmsAdapter,
+  CmsBlock,
+  CmsPage,
+  CmsMenuItem,
+  CmsGlobals,
+  CmsFetchOptions,
+} from './types/cms';
 
 // ── Services / SDK seam ─────────────────────────────────────────────────────
 export { createServices, type Services } from './services/createServices';
