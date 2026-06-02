@@ -1,0 +1,11 @@
+# Docusaurus
+/.docusaurus/
+/build/
+/node_modules/
+
+# Generated changelog (rebuilt by `npm run gen:changelog` before every build)
+/content/changelog.mdx
+
+# Misc
+.DS_Store
+*.log

@@ -1,0 +1,78 @@
+---
+title: Getting started
+sidebar_position: 2
+---
+
+# Getting started
+
+`propeller-v2-core-ui` is a peer-dependency package. You install it
+alongside `propeller-sdk-v2` and one of the framework-specific UI packages
+(`propeller-v2-react-ui` or `propeller-v2-vue-ui`).
+
+## Install
+
+```bash
+# from the GitHub master branch
+npm install github:propeller-commerce/propeller-v2-core-ui#master
+```
+
+Peer dependency:
+
+```bash
+npm install github:propeller-commerce/propeller-sdk-v2#master
+```
+
+Most consumers do **not** install core-ui directly — it is brought in
+transitively by `propeller-v2-react-ui` / `propeller-v2-vue-ui` /
+`propeller-v2-cms-{react,vue}`. Install it directly only when:
+
+- You're authoring a *new* framework-agnostic helper that lives in
+  core-ui itself.
+- You want to use the `Result<T>` contract or the `createServices` SDK
+  seam in a Node script (build pipeline, CLI, edge function) without
+  pulling a UI framework runtime.
+
+## Build
+
+If you cloned the repo to author / debug:
+
+```bash
+npm install
+npm run build         # tsup → dist/{index.js,index.cjs,index.d.ts}
+npm run typecheck     # tsc --noEmit
+npm test              # vitest (Node env — SSR-safe by construction)
+```
+
+The build output is a single ESM + CJS + `.d.ts` triple — the package has
+no internal sub-paths in its public API. Everything is exported from the
+package root.
+
+## First usage
+
+The most common direct use is `createServices(client)` — wire the SDK
+client at the consumer root and pass the returned `services` object down
+through your framework's context:
+
+```ts
+import { createServices } from 'propeller-v2-core-ui';
+import { GraphQLClient } from 'propeller-sdk-v2';
+
+const client = new GraphQLClient(process.env.PROPELLER_API_URL);
+const services = createServices(client);
+
+// services.cart, services.orders, services.products, etc.
+await services.products.getProductsByCategoryId({ categoryId: 42 });
+```
+
+`createServices` is memoised per `GraphQLClient` instance — calling it
+twice with the same client returns the same `services` object, so it's
+safe to call inside SSR request handlers without per-request allocation
+churn.
+
+## Where to next
+
+- **[Types](/types)** — the framework-agnostic types you'll see in props,
+  store state, and service return values.
+- **[Utilities](/utils)** — the helpers you'll reach for first
+  (`formatPrice`, `isContact`, `deriveUserMode`).
+- **[SDK seam](/services)** — what `services` actually contains.

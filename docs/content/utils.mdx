@@ -1,0 +1,186 @@
+---
+title: Utilities
+sidebar_position: 4
+---
+
+# Utilities
+
+Pure helpers grouped by topic. Every export is a free function or
+constant — no classes, no module-scoped state — so each one is trivially
+tree-shakeable. Import what you need from the package root:
+
+```ts
+import { formatPrice, isContact, deriveUserMode } from 'propeller-v2-core-ui';
+```
+
+## Formatting
+
+```ts
+formatPrice(amount: number, opts?: { currency?, locale?, symbol? }): string
+formatDate(date: string | Date, opts?: { locale?, format? }): string
+formatSurcharge(surcharge: number, opts?: { currency?, locale? }): string
+calcDiscountPercent(original: number, current: number): number
+```
+
+`formatPrice` is locale-aware via `Intl.NumberFormat`; the `symbol`
+override exists for shops that display a non-currency-code symbol (e.g.
+`'€'` instead of `'EUR'`). Throws on `NaN`/non-finite values — wrap in
+the `Result` contract at the boundary if upstream data is untrusted.
+
+## Attribute extraction
+
+```ts
+attributeNameMatches(attr, name): boolean
+getAttributeDisplayName(attr, language?): string
+extractAttributeValues(product, attrName): string[]
+collectAttributeValues(products, attrName): Set<string>
+filterProductsBySelections(products, selections): Product[]
+```
+
+The Propeller GraphQL schema returns attributes as a flat array of
+`{ name, value, language? }` records. These helpers handle the
+denormalisation: case-insensitive name matching, multi-language fallback
+via [`languageResolver`](#language-resolution), and selection-based
+filtering for facet UIs.
+
+## Inventory
+
+```ts
+getStockStatus(quantity: number): { label: string, className: string }
+```
+
+Maps a stock quantity to a tri-state UI badge ("In stock" / "Low stock" /
+"Out of stock"). The `className` is a stable token; the framework UI
+packages map it to their own design-token palette.
+
+## Label fallback
+
+```ts
+getLabel(labels: Record<string, string> | undefined, key: string, fallback: string): string
+```
+
+Every component in the UI packages accepts an optional `labels` prop. This
+helper is the canonical implementation — look up `key`, fall back to the
+hardcoded English string. Used in ~50 components.
+
+## Language resolution
+
+```ts
+resolveLanguageEntry<T>(entries: LocalizedEntry<T>[], language: string): T | undefined
+getLanguageString(entries, language, key): string | undefined
+getLanguageUri(entries, language): string | undefined
+```
+
+Walks a `LocalizedEntry[]` array (`{ language, value }`) and resolves the
+right value with a sane fallback chain: requested locale → `en` → first
+entry. Used by attribute extraction, product helpers, and the CMS
+renderer.
+
+## Product helpers
+
+```ts
+getProductImageUrl(product, opts?): string | null
+getClusterImageUrl(cluster, opts?): string | null
+getProductSku(product): string | null
+getClusterSku(cluster): string | null
+getLocalizedValue<T>(entries, language): T | undefined
+```
+
+Encapsulate the "default image / SKU" walks across the SDK's
+`Product` / `Cluster` shape (which can have many images and multiple
+SKUs depending on configuration).
+
+## Truncation
+
+```ts
+stripHtml(html: string): string
+shouldTruncate(text: string, max: number): boolean
+truncateAt(text: string, max: number, ellipsis?: string): string
+```
+
+`stripHtml` is dependency-free — it removes tags but does not sanitise.
+Use it for length calculation and SEO-meta-tag derivation, not for
+rendering untrusted HTML.
+
+## User identity
+
+```ts
+isContact(user: AnyUser): boolean    // user is a B2B Contact
+isCustomer(user: AnyUser): boolean   // user is a B2C Customer
+getUserId(user): string | null
+getCompany(user): Company | null
+getCompanyId(user): string | null
+getAddresses(user): Address[]
+getDefaultInvoiceAddress(user): Address | null
+getDefaultDeliveryAddress(user): Address | null
+```
+
+The Propeller backend returns `Contact` or `Customer` as different SDK
+classes; consumers want a flat predicate. `isContact` uses field presence
+(`'contactId' in user`) so it works on plain-object-serialised users too
+(important for SSR hydration).
+
+## `deriveUserMode`
+
+```ts
+deriveUserMode(user: AnyUser | null, shopMode: ShopMode): UserMode
+//   ShopMode = 'b2b' | 'b2c' | 'hybrid'
+//   UserMode = 'anonymous' | 'b2b' | 'b2c'
+```
+
+Reduces `(user, shopMode)` to the single runtime mode every component
+branches on. Anonymous users always resolve to `'anonymous'` regardless
+of shop mode; logged-in users resolve via `isContact`/`isCustomer`.
+
+In a `'b2b'` shop, a `Customer` who somehow logged in is still treated as
+`'b2b'` — the route guard kicks them out before this is reached, but the
+function is total either way.
+
+```ts
+const mode = deriveUserMode(currentUser, 'hybrid');
+if (mode === 'b2b') showCompanySwitcher();
+```
+
+## Visibility
+
+```ts
+isContentHidden(portalMode: PortalMode, user: AnyUser | null): boolean
+```
+
+Implements the [portal-mode rules](/getting-started#portal-modes) for
+when to hide entire route trees (prices, account, catalog) from
+anonymous visitors. Used by every catalog component and the page guards.
+
+## Video URL normalisation
+
+```ts
+isEmbeddable(url: string): boolean
+normalizeVideoUrl(url: string): string | null
+```
+
+Accepts watch-style YouTube/Vimeo URLs and returns the embed equivalent.
+Returns `null` for unrecognised hosts; callers should fall back to a
+plain `<a href>`.
+
+## JSON-LD builders
+
+```ts
+buildProductJsonLd(product, ctx: JsonLdContext): object
+buildClusterJsonLd(cluster, ctx: JsonLdContext): object
+buildItemListJsonLd(items, ctx: JsonLdContext): object
+safeJsonStringify(value): string
+```
+
+Generate schema.org JSON-LD for product, cluster, and item-list pages.
+`safeJsonStringify` escapes `</script>` runs so the result is safe to
+embed in an inline `<script type="application/ld+json">`.
+
+## Countries
+
+```ts
+COUNTRIES: Country[]                  // ISO 3166-1 alpha-2 + display name
+COUNTRIES_MAP: Record<string, Country>
+getCountryName(code: string, locale?: string): string | null
+```
+
+Used by address forms in the UI packages.

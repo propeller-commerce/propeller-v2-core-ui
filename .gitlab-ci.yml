@@ -20,6 +20,7 @@
 stages:
   - verify
   - mirror
+  - release
 
 default:
   image: node:20
@@ -101,3 +102,74 @@ mirror_to_github:
     - git push --no-thin github --tags --force
   when: on_success
   allow_failure: false
+
+# ── Stage: release ──────────────────────────────────────────────────────────
+# Automatic GitHub Release, driven from GitLab (the source of truth).
+#
+# Why GitLab-driven and not a GitHub Action: the GitHub repo is a one-way
+# force-pushed mirror. A GitHub Action that creates tags/commits would be
+# clobbered by the next mirror push. So the release is cut here, after
+# the mirror, and pushed to the same GitHub remote.
+#
+# Gate (fires a release ONLY when ALL hold):
+#   * package.json "version" has no matching `v<version>` tag yet on GitHub
+#     (idempotent — safe to run on every push; re-runs are clean no-ops)
+#   * the CHANGELOG.md section for that version is NOT marked "Unreleased"
+#     (honours the deliberate-unreleased policy used by the SDK)
+#
+# Requires CI variable GITHUB_TOKEN with `repo` scope (already used by the
+# mirror job) — it is reused here for the Releases API.
+release_to_github:
+  stage: release
+  image:
+    name: alpine/git:latest  # no node; version parsed with sed/grep
+    entrypoint: [""]
+  only:
+    - master
+    - main
+  needs:
+    - mirror_to_github
+  before_script:
+    - apk add --no-cache jq curl >/dev/null 2>&1 || true
+  script:
+    - echo "Evaluating release gate..."
+    - VERSION=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' package.json | head -n1)
+    - 'echo "package.json version: ${VERSION}"'
+    - test -n "$VERSION" || { echo "Could not parse version; aborting."; exit 1; }
+    - TAG="v${VERSION}"
+    - git remote add github https://${GITHUB_TOKEN}@github.com/propeller-commerce/propeller-v2-core-ui.git || true
+    - |
+      if git ls-remote --tags github "refs/tags/${TAG}" | grep -q "${TAG}"; then
+        echo "Tag ${TAG} already on GitHub — release already cut, nothing to do.";
+        exit 0;
+      fi
+    - |
+      if grep -Eiq "^##[[:space:]]*\[${VERSION}\][^\n]*unreleased" CHANGELOG.md; then
+        echo "CHANGELOG marks ${VERSION} as Unreleased — skipping release per policy.";
+        exit 0;
+      fi
+    - |
+      awk -v ver="$VERSION" '
+        $0 ~ ("^## [[]" ver "[]]") {grab=1; next}
+        grab && $0 ~ "^## [[]" {exit}
+        grab {print}
+      ' CHANGELOG.md > RELEASE_BODY.md
+    - test -s RELEASE_BODY.md || { echo "Empty CHANGELOG section for ${VERSION}; aborting."; exit 1; }
+    - 'echo "--- release body ---"; cat RELEASE_BODY.md'
+    - git config --global user.email "ci@propeller-commerce.com"
+    - git config --global user.name "GitLab CI"
+    - git tag -a "${TAG}" -m "Release ${TAG}" || true
+    - git push --no-thin github "refs/tags/${TAG}"
+    - |
+      PAYLOAD=$(jq -n --arg tag "$TAG" --arg name "$TAG" \
+        --rawfile body RELEASE_BODY.md \
+        '{tag_name:$tag, name:$name, body:$body, draft:false, prerelease:false}')
+      HTTP=$(curl -sS -o resp.json -w "%{http_code}" -X POST \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        -H "Accept: application/vnd.github+json" \
+        https://api.github.com/repos/propeller-commerce/propeller-v2-core-ui/releases \
+        -d "$PAYLOAD")
+      echo "GitHub API HTTP ${HTTP}"; cat resp.json
+      case "$HTTP" in 2*) echo "Release ${TAG} created.";; *) echo "Release API call failed."; exit 1;; esac
+  when: on_success
+  allow_failure: true

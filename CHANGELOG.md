@@ -4,6 +4,28 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.2.1] - 2026-06-02
+
+### Added
+
+- **Docusaurus documentation site** under `docs/`, deployed to
+  https://propeller-commerce.github.io/propeller-v2-core-ui/ via a new
+  `.github/workflows/docs.yml` GitHub Action (build + GitHub Pages
+  deploy). Covers getting-started, the type surface, the utility
+  catalogue, the SDK seam (`createServices`), and the `Result<T>`
+  contract design rationale.
+- **`release_to_github` stage in `.gitlab-ci.yml`** — automatic GitHub
+  Release on every `Release X.Y.Z` push, mirroring the SDK pattern.
+  Idempotent (skips if the `v<version>` tag already exists) and gated
+  on a non-"Unreleased" CHANGELOG section. Body is auto-extracted from
+  this file.
+
+### Notes
+
+No runtime / public-API changes — this is a tooling release that
+backfills documentation + release automation for the existing 0.2.0
+surface. Consumers do not need to update.
+
 ## [0.2.0] - 2026-06-01
 
 Adds the framework-agnostic CMS adapter contract and the `userMode` helper

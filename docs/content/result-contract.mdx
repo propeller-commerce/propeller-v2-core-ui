@@ -1,0 +1,109 @@
+---
+title: The Result contract
+sidebar_label: Result&lt;T&gt; contract
+sidebar_position: 6
+---
+
+# The `Result<T, E>` contract
+
+The package-wide convention for mutation results.
+
+## Rule
+
+- **Reads throw.** A failed `getProduct(id)` raises. Callers wrap in
+  `try` / use React or Vue error boundaries / let the framework's
+  request-level error handling take over.
+- **Writes return `Result<T, E>`.** A failed `addToCart` does **not**
+  throw; it returns `{ ok: false, error }`. Callers branch on the
+  discriminant.
+
+## The shape
+
+```ts
+type Result<T, E = Error> =
+  | { ok: true;  value: T }
+  | { ok: false; error: E };
+```
+
+Constructors:
+
+```ts
+import { ok, err, tryAsync } from 'propeller-v2-core-ui';
+
+ok({ cartId: 'abc' });              // { ok: true,  value: ... }
+err(new Error('Out of stock'));      // { ok: false, error: ... }
+
+// Lift a throwing async into a Result
+const r = await tryAsync(() => services.cart.addItem(item));
+//        Result<CartItem, Error>
+```
+
+## Why split?
+
+A handful of empirical observations from the Propeller-next + Propeller-vue
+codebases drove the rule:
+
+1. **Read failures are exceptional.** A 500 on `getProduct` means a
+   shop-wide outage; bubbling it to the framework's error boundary and
+   showing a 5xx page is the right user experience.
+2. **Mutation failures are routine.** "Out of stock", "expired session",
+   "insufficient credit" — these are **expected** failure modes and the
+   UI must surface them in-place, not via an error boundary. Returning
+   `Result` makes the failure path locally visible; you cannot
+   accidentally forget to handle it.
+3. **TypeScript narrows discriminated unions for free.** A `Result<T>`
+   forces the consumer to handle both branches:
+
+   ```ts
+   const r = await services.cart.addItem(item);
+   if (!r.ok) { showToast(r.error.message); return; }
+   console.log('Added', r.value); // r.value is typed as T here
+   ```
+
+4. **Async stack traces lose context.** Throwing an error five layers
+   deep through `async/await` loses the call-site. Returning an error
+   value keeps it at the boundary where it happened.
+
+## What about partial successes?
+
+Some mutations (bulk adds, cart merges) can succeed for some items and
+fail for others. The pattern:
+
+```ts
+type AddManyResult = Result<
+  { added: CartItem[]; failed: Array<{ item: Item; reason: string }> },
+  Error
+>;
+```
+
+`ok: true` with a non-empty `failed` array is valid — the operation
+*completed*, but with caveats. `ok: false` is reserved for hard failures
+(network, auth, malformed input) where no progress was made.
+
+## Pattern: lifting at the boundary
+
+When wrapping an SDK call that throws, lift to `Result` **at the seam**,
+not deep inside a component:
+
+```ts
+// services/cart.ts (the seam)
+async function addItem(item: Item): Promise<Result<CartItem>> {
+  return tryAsync(() => sdkCart.addItem(item));
+}
+
+// component (the consumer)
+const r = await services.cart.addItem(item);
+// r is already Result — no try needed
+```
+
+This keeps `try` blocks out of components and centralises error
+translation (e.g. mapping SDK error codes to user-facing messages).
+
+## What it does NOT replace
+
+- **Validation errors** — use Zod / Valibot upstream. `Result` is for
+  *runtime* failures, not type-system gaps.
+- **Loading state** — that's a UI concern. `Result` describes the
+  *outcome*; loading is the *before*.
+- **Optimistic updates** — those are a state-machine concern that
+  composables handle on top of `Result`-returning services.

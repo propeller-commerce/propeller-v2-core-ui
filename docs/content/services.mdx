@@ -1,0 +1,94 @@
+---
+title: SDK seam
+sidebar_label: SDK seam
+sidebar_position: 5
+---
+
+# SDK seam
+
+`createServices(client)` is the **one** place where the SDK enters the UI
+packages. Everything else — components, composables, contexts — talks to
+`services`, not to `GraphQLClient`. That indirection is what lets the
+React and Vue packages share most of their composable logic and what
+keeps tests fast (you stub `services`, not the network).
+
+## `createServices`
+
+```ts
+import { createServices, type Services } from 'propeller-v2-core-ui';
+import { GraphQLClient } from 'propeller-sdk-v2';
+
+const client = new GraphQLClient(API_URL, { headers: { ... } });
+const services: Services = createServices(client);
+```
+
+The returned `Services` object groups SDK calls by domain:
+
+```ts
+services.auth        // login, register, logout, refreshToken
+services.cart        // create, addItem, updateItem, removeItem, setPaymethod, …
+services.orders      // list, get, setStatus (accept quote), submit
+services.products    // getById, getByCategoryId, getBySearch, getByCluster
+services.companies   // get, listContacts, addContact, …
+services.favorites   // listLists, addToList, removeFromList, createList
+services.cms         // optional — undefined when no CMS adapter wired
+```
+
+(Exact method list lives in the SDK — these are the canonical façades the
+UI packages build composables on top of.)
+
+## Memoisation
+
+`createServices(client)` is memoised on the `client` reference. Calling
+it twice with the same `GraphQLClient` returns the **same** `services`
+object — no per-call allocation, no per-request churn under SSR.
+
+```ts
+const a = createServices(client);
+const b = createServices(client);
+a === b; // true
+```
+
+In practice this means the consumer can call `createServices` at the
+root of every SSR request handler without worrying about allocation
+cost — as long as it reuses the same `GraphQLClient`, the work is done
+once per client lifetime.
+
+## Why "seam"?
+
+The framework-specific UI packages used to import the SDK directly. That
+made:
+
+- **Component tests slow** — every test booted a real GraphQL client.
+- **The package surface unstable** — any SDK refactor rippled into
+  components.
+- **Cross-framework code duplication impossible** — React composables
+  hand-rolled the same SDK calls as Vue composables.
+
+Wrapping the SDK behind `createServices` gives the UI packages a single,
+mockable boundary. Component tests stub `services.cart.addItem`, not the
+network. React and Vue composables share semantic intent; only the state
+shape differs.
+
+## `toPlain`
+
+```ts
+toPlain<T>(value: T): T
+```
+
+Normalises class-instance returns from the SDK (`Cart`, `Order`, …) into
+plain JSON objects. Use at SSR-to-client serialisation boundaries
+(Next.js Server Component → Client Component, Nuxt `useFetch`, etc) so
+the hydration layer doesn't try to serialise getters or method bindings.
+
+```ts
+const cart = await services.cart.get(cartId);
+return { cart: toPlain(cart) };   // safe to JSON.stringify
+```
+
+## Custom services
+
+`createServices` does not currently accept a custom service map override
+— if you need that, fork the call locally and post a PR. The "seam"
+metaphor is deliberate: there is one place to extend, and it lives in
+this package.
