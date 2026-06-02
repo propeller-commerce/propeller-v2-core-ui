@@ -71,6 +71,13 @@ export type {
   CmsFetchOptions,
 } from './types/cms';
 
+// ── Translations contract ───────────────────────────────────────────────────
+export type {
+  TranslationProvider,
+  Locale,
+  Namespace,
+} from './types/translations';
+
 // ── Services / SDK seam ─────────────────────────────────────────────────────
 export { createServices, type Services } from './services/createServices';
 export { toPlain } from './services/toPlain';

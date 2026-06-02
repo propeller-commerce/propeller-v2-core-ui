@@ -4,6 +4,12 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## 0.2.2
+
+### Added
+
+- `TranslationProvider` interface + `Locale` / `Namespace` type aliases (`./types/translations`). Apps implement this contract to provide translated labels to UI components via the existing `labels?: Record<string, string>` prop. Sync by design; the file/CMS/TMS choice is the app's.
+
 ## [0.2.1] - 2026-06-02
 
 ### Added
