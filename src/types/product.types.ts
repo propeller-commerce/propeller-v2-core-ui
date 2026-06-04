@@ -4,7 +4,7 @@ import type {
   ProductsResponse,
   AttributeResult,
   GraphQLClient,
-} from 'propeller-sdk-v2';
+} from '@propeller-commerce/propeller-sdk-v2';
 
 export interface ProductSearchOptions {
   graphqlClient: GraphQLClient;

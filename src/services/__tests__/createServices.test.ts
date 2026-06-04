@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GraphQLClient } from 'propeller-sdk-v2';
+import { GraphQLClient } from '@propeller-commerce/propeller-sdk-v2';
 import { createServices, type Services } from '../createServices';
 
 /**

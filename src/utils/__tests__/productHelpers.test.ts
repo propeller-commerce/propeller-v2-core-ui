@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Product, Cluster } from 'propeller-sdk-v2';
+import type { Product, Cluster } from '@propeller-commerce/propeller-sdk-v2';
 import {
   getProductImageUrl,
   getClusterImageUrl,

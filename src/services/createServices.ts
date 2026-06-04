@@ -15,7 +15,7 @@ import {
   PurchaseAuthorizationConfigService,
   ClusterService,
   OrderlistService,
-} from 'propeller-sdk-v2';
+} from '@propeller-commerce/propeller-sdk-v2';
 
 /**
  * The single SDK seam for the whole package suite.

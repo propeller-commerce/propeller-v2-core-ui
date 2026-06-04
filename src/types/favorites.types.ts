@@ -1,11 +1,11 @@
 import type {
   FavoriteList,
   GraphQLClient,
-} from 'propeller-sdk-v2';
+} from '@propeller-commerce/propeller-sdk-v2';
 
 export interface FavoritesOptions {
   graphqlClient: GraphQLClient;
-  user: import('propeller-sdk-v2').Contact | import('propeller-sdk-v2').Customer | null;
+  user: import('@propeller-commerce/propeller-sdk-v2').Contact | import('@propeller-commerce/propeller-sdk-v2').Customer | null;
   language?: string;
 }
 

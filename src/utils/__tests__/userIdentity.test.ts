@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Contact, Customer, Address } from 'propeller-sdk-v2';
+import type { Contact, Customer, Address } from '@propeller-commerce/propeller-sdk-v2';
 import {
   isContact,
   isCustomer,

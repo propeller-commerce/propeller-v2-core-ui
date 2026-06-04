@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { isContentHidden } from '../visibilityHelpers';
-import type { Contact } from 'propeller-sdk-v2';
+import type { Contact } from '@propeller-commerce/propeller-sdk-v2';
 
 const someUser = { contactId: 1 } as Contact;
 

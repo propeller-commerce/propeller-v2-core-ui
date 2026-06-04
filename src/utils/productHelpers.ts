@@ -1,4 +1,4 @@
-import type { Cluster, Product } from 'propeller-sdk-v2';
+import type { Cluster, Product } from '@propeller-commerce/propeller-sdk-v2';
 import { getLanguageString } from './languageResolver';
 
 export function getProductImageUrl(product: Product | null | undefined): string {

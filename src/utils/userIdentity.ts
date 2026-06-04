@@ -4,7 +4,7 @@
  * Framework-agnostic. Used by both Vue and React composables/hooks.
  */
 
-import type { Contact, Customer, Address, Company } from 'propeller-sdk-v2';
+import type { Contact, Customer, Address, Company } from '@propeller-commerce/propeller-sdk-v2';
 
 export type AnyUser = Contact | Customer | null;
 

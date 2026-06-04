@@ -25,8 +25,8 @@ import type {
   Contact,
   Customer,
   Product,
-} from 'propeller-sdk-v2';
-import { ProductClass } from 'propeller-sdk-v2';
+} from '@propeller-commerce/propeller-sdk-v2';
+import { ProductClass } from '@propeller-commerce/propeller-sdk-v2';
 import { getLanguageString } from './languageResolver';
 import { stripHtml } from './truncation';
 import { getProductImageUrl, getClusterImageUrl } from './productHelpers';

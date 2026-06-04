@@ -4,6 +4,26 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.2.4] - 2026-06-04
+
+### Changed
+
+- **SDK dependency switched from GitHub tarball to npm.** Both the
+  `peerDependencies` entry and the `devDependencies` test pin now point
+  at `@propeller-commerce/propeller-sdk-v2@^0.11.1` instead of
+  `github:propeller-commerce/propeller-sdk-v2#master`. All 18 source +
+  test files renamed accordingly (`from 'propeller-sdk-v2'` →
+  `from '@propeller-commerce/propeller-sdk-v2'`, plus the `/enum`
+  subpath).
+
+### Why
+
+The SDK is now published on npm as a properly scoped package. Pinning
+via npm removes the GitLab→GitHub mirror dependency from the install
+chain and gives consumers semver ranges instead of a moving master tip.
+Behaviour is unchanged — the 0.11.0 github tip and the 0.11.1 npm
+tarball are export-identical.
+
 ## [0.2.3] - 2026-06-04
 
 ### Fixed

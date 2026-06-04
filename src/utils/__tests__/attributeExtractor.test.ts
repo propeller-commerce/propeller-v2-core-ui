@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import type { AttributeResult, Product } from 'propeller-sdk-v2';
-import { AttributeType } from 'propeller-sdk-v2';
+import type { AttributeResult, Product } from '@propeller-commerce/propeller-sdk-v2';
+import { AttributeType } from '@propeller-commerce/propeller-sdk-v2';
 import {
   attributeNameMatches,
   getAttributeDisplayName,

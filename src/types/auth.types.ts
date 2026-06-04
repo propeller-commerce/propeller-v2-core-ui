@@ -1,4 +1,4 @@
-import type { Contact, Customer, GraphQLClient } from 'propeller-sdk-v2';
+import type { Contact, Customer, GraphQLClient } from '@propeller-commerce/propeller-sdk-v2';
 
 export interface LoginCredentials {
   email: string;

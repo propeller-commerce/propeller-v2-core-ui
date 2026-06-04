@@ -7,8 +7,8 @@
  * Framework-agnostic pure functions.
  */
 
-import type { AttributeResult } from 'propeller-sdk-v2';
-import { AttributeType } from 'propeller-sdk-v2';
+import type { AttributeResult } from '@propeller-commerce/propeller-sdk-v2';
+import { AttributeType } from '@propeller-commerce/propeller-sdk-v2';
 
 /**
  * Checks whether an AttributeResult matches a given target attribute name,
@@ -117,7 +117,7 @@ export function extractAttributeValues(attr: AttributeResult): string[] {
  * Collects all unique values for a named attribute across a list of products.
  */
 export function collectAttributeValues(
-  products: import('propeller-sdk-v2').Product[],
+  products: import('@propeller-commerce/propeller-sdk-v2').Product[],
   attributeName: string
 ): string[] {
   const set = new Set<string>();
@@ -137,9 +137,9 @@ export function collectAttributeValues(
  * Filters a product list to those that match ALL given attribute selections.
  */
 export function filterProductsBySelections(
-  products: import('propeller-sdk-v2').Product[],
+  products: import('@propeller-commerce/propeller-sdk-v2').Product[],
   selections: Record<string, string>
-): import('propeller-sdk-v2').Product[] {
+): import('@propeller-commerce/propeller-sdk-v2').Product[] {
   const entries = Object.entries(selections);
   if (entries.length === 0) return products;
 

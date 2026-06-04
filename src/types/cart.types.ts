@@ -7,18 +7,18 @@ import type {
   CartStartVariables,
   Address,
   GraphQLClient,
-} from 'propeller-sdk-v2';
+} from '@propeller-commerce/propeller-sdk-v2';
 
 export interface CartInitOptions {
   graphqlClient: GraphQLClient;
-  user: import('propeller-sdk-v2').Contact | import('propeller-sdk-v2').Customer | null;
+  user: import('@propeller-commerce/propeller-sdk-v2').Contact | import('@propeller-commerce/propeller-sdk-v2').Customer | null;
   /** Active company ID (overrides user's default company) */
   companyId?: number;
   /** Configuration object carrying imageSearchFilters, imageVariantFilters, language */
   configuration: {
     language?: string;
-    imageSearchFiltersGrid: import('propeller-sdk-v2').MediaImageProductSearchInput;
-    imageVariantFiltersSmall: import('propeller-sdk-v2').TransformationsInput;
+    imageSearchFiltersGrid: import('@propeller-commerce/propeller-sdk-v2').MediaImageProductSearchInput;
+    imageVariantFiltersSmall: import('@propeller-commerce/propeller-sdk-v2').TransformationsInput;
   };
   onCartCreated?: (cart: Cart) => void;
 }

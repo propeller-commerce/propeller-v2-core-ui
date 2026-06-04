@@ -2,7 +2,7 @@ import type {
   Order,
   OrderItem,
   GraphQLClient,
-} from 'propeller-sdk-v2';
+} from '@propeller-commerce/propeller-sdk-v2';
 
 export interface OrderSearchFilters {
   query?: string;
@@ -15,7 +15,7 @@ export interface OrderSearchFilters {
 
 export interface OrderListOptions {
   graphqlClient: GraphQLClient;
-  user: import('propeller-sdk-v2').Contact | import('propeller-sdk-v2').Customer | null;
+  user: import('@propeller-commerce/propeller-sdk-v2').Contact | import('@propeller-commerce/propeller-sdk-v2').Customer | null;
   companyId?: number;
   language?: string;
   itemsPerPage?: number;
@@ -26,7 +26,7 @@ export type PdfDownloadResult =
   | { success: false; error: string };
 
 export type ReorderResult =
-  | { success: true; cart: import('propeller-sdk-v2').Cart }
+  | { success: true; cart: import('@propeller-commerce/propeller-sdk-v2').Cart }
   | { success: false; error: string };
 
 export type { Order, OrderItem };

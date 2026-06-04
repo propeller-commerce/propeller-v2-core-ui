@@ -1,4 +1,4 @@
-import type { Company, Contact, GraphQLClient } from 'propeller-sdk-v2';
+import type { Company, Contact, GraphQLClient } from '@propeller-commerce/propeller-sdk-v2';
 
 export interface CompanyOptions {
   graphqlClient: GraphQLClient;

@@ -1,4 +1,4 @@
-import type { Contact, Customer } from 'propeller-sdk-v2';
+import type { Contact, Customer } from '@propeller-commerce/propeller-sdk-v2';
 
 export function isContentHidden(
   portalMode: string | undefined,
