@@ -4,6 +4,22 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.2.3] - 2026-06-04
+
+### Fixed
+
+- **`getLanguageString` now treats empty `value: ''` entries as
+  missing.** Previously the function returned the matching entry's
+  `value` verbatim — including the empty string — which short-circuited
+  the fallback and rendered an invisible product name when the SDK
+  returned a placeholder `{ language: 'NL', value: '' }`. The resolver
+  now tries the other entries before giving up, matching what consumers
+  expect from "localised value missing → use any available
+  translation". Downstream effect: `ProductCard`, `CartItem`, and
+  bundle/crossupsell name helpers in `propeller-v2-react-ui` and
+  `propeller-v2-vue-ui` no longer render blank names against datasets
+  with sparse localisation.
+
 ## 0.2.2
 
 ### Added
