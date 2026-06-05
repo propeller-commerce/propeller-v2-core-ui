@@ -78,9 +78,9 @@ export type {
   Namespace,
 } from './types/translations';
 
-// ── Component-slot contracts (partner extension API, Plan 1) ───────────────
-// Used by propeller-v2-react-ui and propeller-v2-vue-ui to type partner-
-// provided sub-components. Runtime-free.
+// ── Component-slot contracts (extension API) ───────────────────────────────
+// Used by propeller-v2-react-ui and propeller-v2-vue-ui to type injected
+// sub-components. Runtime-free.
 export type {
   PriceComponentProps,
   StockComponentProps,

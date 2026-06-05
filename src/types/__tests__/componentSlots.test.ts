@@ -12,11 +12,11 @@ import type {
 } from '../componentSlots';
 
 /**
- * Type-shape assertions for the partner extension API contract types.
+ * Type-shape assertions for the extension API contract types.
  *
  * Catches drift in the shared *ComponentProps interfaces — these are imported
- * directly by propeller-v2-react-ui and propeller-v2-vue-ui to type partner-
- * provided sub-components, so any unintentional shape change is a downstream
+ * directly by propeller-v2-react-ui and propeller-v2-vue-ui to type injected
+ * sub-components, so any unintentional shape change is a downstream
  * compile break.
  */
 describe('componentSlots contracts', () => {
