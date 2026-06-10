@@ -1,10 +1,12 @@
 {
-  "name": "propeller-v2-core-ui",
+  "name": "@propeller-commerce/propeller-v2-core-ui",
   "version": "0.2.4",
   "description": "Framework-agnostic core for Propeller Commerce UI packages — pure TS types, normalizers, SDK service factory, and the Result<T> contract. Consumed by propeller-v2-vue-ui and propeller-v2-react-ui.",
   "license": "MIT",
-  "private": true,
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
