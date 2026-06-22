@@ -63,12 +63,47 @@ export { deriveUserMode, type ShopMode, type UserMode } from './utils/userMode';
 
 // ── CMS adapter contract ────────────────────────────────────────────────────
 export type {
+  // Minimal contract (opaque blocks) — used by the generic cms-react/cms-vue
+  // renderers.
   CmsAdapter,
   CmsBlock,
   CmsPage,
   CmsMenuItem,
   CmsGlobals,
   CmsFetchOptions,
+  // Rich, full-fidelity contract — promoted from the Next boilerplate.
+  CmsProvider,
+  CmsPageOptions,
+  CmsRichPage,
+  CmsTypedBlock,
+  CmsImage,
+  CmsSeo,
+  // Typed blocks
+  CmsHeroBanner,
+  CmsRichText,
+  CmsMedia,
+  CmsQuote,
+  CmsValuePropItem,
+  CmsValueProps,
+  CmsCallToAction,
+  CmsProductCarousel,
+  CmsContactForm,
+  CmsSlider,
+  CmsProductSlider,
+  CmsFeature,
+  CmsFaq,
+  CmsProductCard,
+  CmsProductCards,
+  CmsPostCards,
+  CmsStatic,
+  // Article / blog
+  CmsAuthor,
+  CmsArticle,
+  // Category banner + global
+  CmsCategoryBanner,
+  CmsNavLink,
+  CmsFooterColumn,
+  CmsGlobal,
 } from './types/cms';
 
 // ── Translations contract ───────────────────────────────────────────────────

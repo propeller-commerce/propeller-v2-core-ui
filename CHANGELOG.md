@@ -4,6 +4,42 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.3.0] - 2026-06-19
+
+### Added
+
+- **Rich CMS model + `CmsProvider` contract promoted from the Next
+  boilerplate.** `propeller-next`'s in-production CMS layer had grown a much
+  richer contract than core's minimal `CmsAdapter` (3 methods, opaque blocks).
+  This release promotes that richer model into `src/types/cms.ts` so the
+  accelerator's adapters can express everything a real storefront renders:
+  - New `CmsProvider` interface (8 methods + optional `getMenu`): `getPage`,
+    `getAllPageSlugs`, `getGlobal`, `getCategoryBanner`, `getArticles`,
+    `getArticle`, `getAllArticleSlugs`, `resolveImageUrl`. A strict superset of
+    `CmsAdapter`.
+  - Typed block catalog `CmsTypedBlock` (15 named blocks: `CmsHeroBanner`,
+    `CmsValueProps`, `CmsProductCards`, `CmsFeature`, `CmsFaq`, …) discriminated
+    by `_type`.
+  - `CmsRichPage` (template + typed blocks + typed SEO), `CmsArticle` /
+    `CmsAuthor` (blog), `CmsCategoryBanner`, typed `CmsGlobal` (header/footer),
+    `CmsImage`, `CmsSeo`, `CmsPageOptions`.
+
+### Changed
+
+- Nothing removed or renamed. The original `CmsAdapter`, opaque `CmsBlock`,
+  `CmsPage`, `CmsMenuItem`, `CmsGlobals`, and `CmsFetchOptions` are unchanged
+  and still exported — the generic `cms-react` / `cms-vue` renderers keep
+  dispatching on the opaque block. This is a purely additive minor.
+
+### Why
+
+The accelerator's bundled CMS adapters were stuck at the 3-method minimal
+contract, which could not express category banners, blog articles, static-slug
+enumeration, or image resolution that the boilerplates depend on — so a
+scaffolded shop and a boilerplate shop were not interchangeable. Promoting the
+boilerplate's proven contract into the shared core makes them converge, and is
+what lets the Strapi / Prepr / generic adapters implement the full surface.
+
 ## [0.2.4] - 2026-06-04
 
 ### Changed
