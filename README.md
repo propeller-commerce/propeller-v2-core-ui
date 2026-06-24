@@ -2,6 +2,8 @@
 
 Framework-agnostic core for the Propeller Commerce UI packages.
 
+📖 **Docs (canonical reference for types & contracts):** https://propeller-commerce.github.io/propeller-v2-core-ui/
+
 Pure TypeScript — no Vue, no React, no browser APIs. Safe to import from any
 runtime (Node SSR, build scripts, tests). Consumed by:
 

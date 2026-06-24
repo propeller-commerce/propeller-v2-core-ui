@@ -4,6 +4,14 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.3.1] - 2026-06-24
+
+### Documentation
+
+- Added a link to the canonical docs site
+  (https://propeller-commerce.github.io/propeller-v2-core-ui/) at the top of the
+  README, as the source of truth for types and contracts.
+
 ## [0.3.0] - 2026-06-19
 
 ### Added
