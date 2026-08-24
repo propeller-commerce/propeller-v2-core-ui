@@ -1,0 +1,46 @@
+---
+title: Introduction
+slug: /
+---
+
+# propeller-v2-core-ui
+
+Framework-agnostic core for the Propeller Commerce UI packages.
+
+Pure TypeScript — **no Vue, no React, no DOM APIs**. Safe to import from
+Node SSR, build scripts, edge runtimes, or tests without pulling a
+framework runtime. Consumed by:
+
+- [`propeller-v2-react-ui`](https://propeller-commerce.github.io/propeller-v2-react-ui/)
+- [`propeller-v2-vue-ui`](https://propeller-commerce.github.io/propeller-v2-vue-ui/)
+- [`propeller-v2-cms-react`](https://propeller-commerce.github.io/propeller-v2-cms-react/)
+- [`propeller-v2-cms-vue`](https://propeller-commerce.github.io/propeller-v2-cms-vue/)
+- The Propeller Commerce shop templates shipped by
+  [`propeller-v2-accelerator`](https://propeller-commerce.github.io/propeller-v2-accelerator/).
+
+## What's here
+
+| Surface | Purpose |
+|---|---|
+| **Types** | Domain shapes (`auth`, `cart`, `company`, `favorites`, `orders`, `pagination`, `product`), the `CmsAdapter` contract, and the `Result<T, E>` discriminated union for mutation results |
+| **Utilities** | Pure helpers: formatting (price/date), attribute extraction, user identity (Contact vs Customer), `userMode` derivation, countries, language resolution, JSON-LD builders, video URL normalisation, visibility helpers, truncation, inventory status, label fallback |
+| **Services** | `createServices(client)` — the single SDK seam. Memoized per `GraphQLClient`. Plus `toPlain` for normalising class-instance serialisation. |
+
+The `Result<T, E>` discriminated union is the package-wide contract for
+mutations. **Reads throw; writes return `Result`.**
+
+## Status
+
+The package is **pre-1.0** (`0.x`). Public API may change between minor
+versions until it stabilises; breaking changes are called out in
+[the changelog](/changelog).
+
+## Next steps
+
+- **[Getting started](/getting-started)** — install, build, and how the
+  package fits into the wider Propeller stack.
+- **[Types](/types)** — the domain types and CMS adapter contract.
+- **[Utilities](/utils)** — pure helpers grouped by topic.
+- **[SDK seam](/services)** — how `createServices(client)` works.
+- **[The `Result<T>` contract](/result-contract)** — why writes return
+  `Result` and reads throw.

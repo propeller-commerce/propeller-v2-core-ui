@@ -1,0 +1,98 @@
+---
+title: Types
+sidebar_position: 3
+---
+
+# Types
+
+Domain shapes that flow between the SDK, the UI packages, and your shop
+code. All framework-agnostic — pure TypeScript interfaces and discriminated
+unions. No runtime cost when consumed type-only.
+
+## Domain types
+
+Re-exported from the package root.
+
+| Module | Exports |
+|---|---|
+| `auth.types` | `AuthUser`, `RegisterInput`, `LoginCredentials`, … |
+| `cart.types` | `Cart`, `CartItem`, `CartTotals`, … |
+| `company.types` | `Company`, `CompanyAddress`, `CompanyUser` (Contact), … |
+| `favorites.types` | `FavoriteList`, `FavoriteItem`, … |
+| `orders.types` | `Order`, `OrderLine`, `OrderStatus`, … |
+| `pagination.types` | `Page<T>`, `PageInfo`, … |
+| `product.types` | `Product`, `Cluster`, `Attribute`, `Price`, … |
+
+The shapes mirror the SDK's GraphQL response types but are hand-written
+so they can express domain rules (e.g. discriminated unions on user type)
+that the schema generator can't.
+
+## `Result<T, E>` — the mutation contract
+
+The package-wide convention is:
+
+- **Reads throw.** A failed `getProduct(id)` raises — there is no
+  meaningful "successful failure" for a read. Callers wrap in `try`
+  / use React/Vue error boundaries.
+- **Writes return `Result<T, E>`.** A failed `addToCart` does not throw;
+  it returns `{ ok: false, error }`. Callers branch on the discriminant.
+
+```ts
+import type { Result } from 'propeller-v2-core-ui';
+import { ok, err, tryAsync } from 'propeller-v2-core-ui';
+
+// Construct results explicitly
+const success = ok({ cartId: 'abc' });           // { ok: true, value: ... }
+const failure = err(new Error('Out of stock'));   // { ok: false, error: ... }
+
+// Lift a throwing async into a Result
+const result = await tryAsync(() => services.cart.addItem(item));
+if (!result.ok) {
+  showToast(result.error.message);
+  return;
+}
+console.log('Added', result.value);
+```
+
+See **[The Result contract](/result-contract)** for the design rationale
+and the rules for when to throw vs return.
+
+## `CmsAdapter` contract
+
+The framework-agnostic interface every CMS adapter implements.
+
+```ts
+import type { CmsAdapter, CmsPage, CmsBlock } from 'propeller-v2-core-ui';
+
+interface CmsAdapter {
+  getPage(slug: string, opts?: CmsFetchOptions): Promise<CmsPage | null>;
+  getMenu(name: string, opts?: CmsFetchOptions): Promise<CmsMenuItem[] | null>;
+  getGlobals(opts?: CmsFetchOptions): Promise<CmsGlobals>;
+}
+```
+
+Concrete implementations live in
+[`propeller-v2-accelerator`](https://propeller-commerce.github.io/propeller-v2-accelerator/)'s
+`cms-adapter-strapi` and `cms-adapter-cms` packages. Shop code wires the
+adapter into React or Vue via `propeller-v2-cms-react` /
+`propeller-v2-cms-vue`.
+
+Types:
+
+- **`CmsPage`** — `{ slug, title, blocks: CmsBlock[], seo?: {...} }`
+- **`CmsBlock`** — `{ __typename: string, … }`. Block-type-specific
+  fields are looked up by `__typename` in the renderer.
+- **`CmsMenuItem`** — recursive `{ label, href, children? }`.
+- **`CmsGlobals`** — `Record<string, unknown>` of shop-wide values
+  (footer text, banner copy, …).
+- **`CmsFetchOptions`** — `{ locale?, preview? }`.
+
+A shop without a CMS passes `null` instead of an adapter; the React/Vue
+glue treats null as "no CMS configured" — the homepage falls back to a
+static layout and `/<slug>` returns 404.
+
+## What's NOT here
+
+- `User`, `Contact`, `Customer` as concrete classes. Those live in
+  the SDK because they need GraphQL-decoded runtime instances. core-ui
+  exposes the `AnyUser` *type* via [user identity helpers](/utils#user-identity).

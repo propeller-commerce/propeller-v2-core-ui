@@ -1,0 +1,148 @@
+/**
+ * propeller-v2-core-ui — public surface.
+ *
+ * Pure TS. No Vue, no React, no DOM. Safe to import from Node SSR contexts,
+ * build scripts, or tests without pulling a framework runtime.
+ */
+
+// ── Result<T, E> contract ───────────────────────────────────────────────────
+export { ok, err, tryAsync, type Result } from './types/result';
+
+// ── Utilities ───────────────────────────────────────────────────────────────
+export {
+  attributeNameMatches,
+  getAttributeDisplayName,
+  extractAttributeValues,
+  collectAttributeValues,
+  filterProductsBySelections,
+} from './utils/attributeExtractor';
+export { COUNTRIES, COUNTRIES_MAP, getCountryName, type Country } from './utils/countries';
+export { getNettedBonusItems } from './utils/orderHelpers';
+export {
+  formatPrice,
+  formatDate,
+  formatSurcharge,
+  calcDiscountPercent,
+} from './utils/formatting';
+export {
+  getStockStatus,
+  buildInventoryFilter,
+  MIN_STOCK_THRESHOLD,
+  type Availability,
+} from './utils/inventoryHelpers';
+export { getLabel } from './utils/labelHelpers';
+export {
+  resolveLanguageEntry,
+  getLanguageString,
+  getLanguageUri,
+  type LocalizedEntry,
+} from './utils/languageResolver';
+export {
+  getProductImageUrl,
+  getClusterImageUrl,
+  getProductSku,
+  getClusterSku,
+  getLocalizedValue,
+} from './utils/productHelpers';
+export { stripHtml, shouldTruncate, truncateAt } from './utils/truncation';
+export {
+  isContact,
+  isCustomer,
+  getUserId,
+  getCompany,
+  getCompanyId,
+  getAddresses,
+  getDefaultInvoiceAddress,
+  getDefaultDeliveryAddress,
+  type AnyUser,
+} from './utils/userIdentity';
+export { isEmbeddable, normalizeVideoUrl } from './utils/videoTransform';
+export { isContentHidden } from './utils/visibilityHelpers';
+export {
+  buildProductJsonLd,
+  buildClusterJsonLd,
+  buildItemListJsonLd,
+  safeJsonStringify,
+  type JsonLdContext,
+} from './utils/jsonLd';
+export { deriveUserMode, type ShopMode, type UserMode } from './utils/userMode';
+
+// ── CMS adapter contract ────────────────────────────────────────────────────
+export type {
+  // Minimal contract (opaque blocks) — used by the generic cms-react/cms-vue
+  // renderers.
+  CmsAdapter,
+  CmsBlock,
+  CmsPage,
+  CmsMenuItem,
+  CmsGlobals,
+  CmsFetchOptions,
+  // Rich, full-fidelity contract — promoted from the Next boilerplate.
+  CmsProvider,
+  CmsPageOptions,
+  CmsRichPage,
+  CmsTypedBlock,
+  CmsImage,
+  CmsSeo,
+  // Typed blocks
+  CmsHeroBanner,
+  CmsRichText,
+  CmsMedia,
+  CmsQuote,
+  CmsValuePropItem,
+  CmsValueProps,
+  CmsCallToAction,
+  CmsProductCarousel,
+  CmsContactForm,
+  CmsSlider,
+  CmsProductSlider,
+  CmsFeature,
+  CmsFaq,
+  CmsProductCard,
+  CmsProductCards,
+  CmsPostCards,
+  CmsStatic,
+  // Article / blog
+  CmsAuthor,
+  CmsArticle,
+  // Category banner + global
+  CmsCategoryBanner,
+  CmsNavLink,
+  CmsFooterColumn,
+  CmsGlobal,
+} from './types/cms';
+
+// ── Translations contract ───────────────────────────────────────────────────
+export type {
+  TranslationProvider,
+  Locale,
+  Namespace,
+} from './types/translations';
+
+// ── Component-slot contracts (extension API) ───────────────────────────────
+// Used by propeller-v2-react-ui and propeller-v2-vue-ui to type injected
+// sub-components. Runtime-free.
+export type {
+  PriceComponentProps,
+  StockComponentProps,
+  AddToCartComponentProps,
+  ImageComponentProps,
+  BadgesComponentProps,
+  FavoriteComponentProps,
+  ProductBundlesComponentProps,
+  ProductBulkPricesComponentProps,
+  ProductSurchargesComponentProps,
+} from './types/componentSlots';
+
+// ── Services / SDK seam ─────────────────────────────────────────────────────
+export { createServices, type Services } from './services/createServices';
+export { toPlain } from './services/toPlain';
+
+// ── Domain type re-exports (type-only; no runtime cost) ─────────────────────
+export type * from './types/auth.types';
+export type * from './types/cart.types';
+export type * from './types/company.types';
+export type * from './types/favorites.types';
+export type * from './types/orders.types';
+export type * from './types/pagination.types';
+export type * from './types/product.types';
