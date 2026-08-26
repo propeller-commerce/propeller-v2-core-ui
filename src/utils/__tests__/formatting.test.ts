@@ -12,8 +12,10 @@ describe('formatPrice', () => {
     expect(formatPrice(9.5, { symbol: '€' })).toBe('€ 9,50');
     expect(formatPrice(1000, { symbol: '$' })).toBe('$ 1.000,00');
     expect(formatPrice(0, { symbol: '€' })).toBe('€ 0,00');
-    // An explicit locale controls the number format.
-    expect(formatPrice(9.5, { symbol: '€', locale: 'en-US' })).toBe('€ 9.50');
+    // An explicit locale controls the number format AND the symbol's placement:
+    // English locales set the glyph tight against the amount.
+    expect(formatPrice(9.5, { symbol: '€', locale: 'en-US' })).toBe('€9.50');
+    expect(formatPrice(3.45, { symbol: '£', locale: 'en-GB' })).toBe('£3.45');
   });
 
   it('with an explicit symbol, rounds to 2 decimals', () => {
@@ -32,7 +34,7 @@ describe('formatPrice', () => {
   });
 
   it('the symbol branch overrides the currency symbol; locale still drives the number', () => {
-    expect(formatPrice(10, { symbol: '£', currency: 'EUR', locale: 'en-US' })).toBe('£ 10.00');
+    expect(formatPrice(10, { symbol: '£', currency: 'EUR', locale: 'en-US' })).toBe('£10.00');
   });
 
   it('treats an empty-string symbol as a provided symbol (no prefix, locale-formatted number)', () => {

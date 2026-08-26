@@ -5,6 +5,34 @@
  */
 
 /**
+ * Maps a storefront language code ('EN', 'NL', …) to the BCP-47 locale used to
+ * format numbers and dates for it.
+ *
+ * Number formatting and the currency are two independent decisions, and only
+ * the currency was ever reachable: prices on an English storefront came out
+ * with Dutch separators because every caller left the locale at its `nl-NL`
+ * default. Pass `localeForLanguage(language)` and the separators follow the
+ * language the shopper is reading.
+ *
+ * An explicit BCP-47 tag (one containing a `-`) is returned unchanged, so a
+ * shop can pin `en-US` vs `en-GB` itself.
+ */
+export function localeForLanguage(language?: string | null): string {
+  if (!language) return 'nl-NL';
+  if (language.includes('-')) return language;
+  const known: Record<string, string> = {
+    NL: 'nl-NL',
+    EN: 'en-GB',
+    DE: 'de-DE',
+    FR: 'fr-FR',
+    ES: 'es-ES',
+    IT: 'it-IT',
+    BE: 'nl-BE',
+  };
+  return known[language.toUpperCase()] ?? 'nl-NL';
+}
+
+/**
  * Formats a numeric price to a localised currency string.
  * Defaults to EUR (€) with 2 decimal places.
  */
@@ -28,7 +56,31 @@ export function formatPrice(
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(Number(amount));
-    return symbol ? `${symbol} ${formattedNumber}` : formattedNumber;
+    if (!symbol) return formattedNumber;
+    // Where the symbol sits, and whether a space follows it, is part of the
+    // locale — `€ 9,50` in nl-NL but `£3.45` in en-GB. Hardcoding
+    // `${symbol} ${number}` made every non-Dutch shop render `£ 3,45`: right
+    // glyph, Dutch spacing, Dutch separators. Ask Intl to lay out a currency
+    // amount in this locale and swap its symbol for ours.
+    // Intl separates the two with U+00A0; normalise it so callers comparing
+    // against a plain space keep matching.
+    try {
+      const parts = new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).formatToParts(Number(amount));
+      if (parts.some((part) => part.type === 'currency')) {
+        return parts
+          .map((part) => (part.type === 'currency' ? symbol : part.value))
+          .join('')
+          .replace(/ /g, ' ');
+      }
+    } catch {
+      /* Unknown currency code — fall through to the simple prefix below. */
+    }
+    return `${symbol} ${formattedNumber}`;
   }
 
   try {

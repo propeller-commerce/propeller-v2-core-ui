@@ -1,6 +1,7 @@
 // src/types/componentSlots.ts
 import type {
   Cart,
+  CartChildItemInput,
   CartMainItem,
   Cluster,
   Inventory,
@@ -48,10 +49,21 @@ export interface AddToCartComponentProps {
   showModal?: boolean;
   enableStockValidation?: boolean;
   beforeAddToCart?: () => boolean;
+  /**
+   * Same positional signature as `AddToCartProps.onAddToCart` on the component
+   * itself. It used to be `(product, quantity?, notes?)`, which meant argument 2
+   * was `clusterId` in one and `quantity` in the other: a component written
+   * against this contract could not forward the prop to the real `<AddToCart>`
+   * at all.
+   */
   onAddToCart?: (
     product: Product,
+    clusterId?: number,
     quantity?: number,
+    childItems?: CartChildItemInput[],
     notes?: string,
+    price?: number,
+    showModal?: boolean,
   ) => Cart | Promise<Cart>;
   afterAddToCart?: (cart: Cart, item?: CartMainItem) => void;
   onProceedToCheckout?: () => void;

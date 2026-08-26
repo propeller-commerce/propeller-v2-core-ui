@@ -4,6 +4,35 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.7.0] - 2026-08-26
+
+### Added
+
+- **`localeForLanguage(language)`** — maps a storefront language code to the
+  BCP-47 locale used to format its numbers and dates (`EN` → `en-GB`, `NL` →
+  `nl-NL`, …). An explicit tag containing a `-` is returned unchanged, so a shop
+  can pin `en-US` over `en-GB` itself. Currency and number formatting were two
+  independent decisions and only the currency was reachable: every caller left
+  `formatPrice`'s locale at its `nl-NL` default, so an English storefront
+  rendered `£ 3,45`.
+
+### Changed
+
+- **`formatPrice` places the symbol the way the locale does.** The explicit-
+  symbol branch hardcoded `${symbol} ${amount}`, which is right for `nl-NL`
+  (`€ 9,50`) and wrong everywhere else (`£ 3,45` instead of `£3.45`). It now
+  lays the amount out with `Intl.NumberFormat`'s own currency pattern and
+  substitutes the caller's glyph. Dutch output is byte-identical — the
+  non-breaking space Intl emits is normalised back to a plain space — so only
+  non-Dutch locales change.
+- **`AddToCartComponentProps.onAddToCart` matches the component it feeds.** It
+  declared `(product, quantity?, notes?)` while `AddToCart` calls
+  `(product, clusterId?, quantity?, childItems?, notes?, price?, showModal?)`:
+  argument 2 meant `clusterId` in one and `quantity` in the other, so a
+  component written against the slot contract could not forward the prop to the
+  real `<AddToCart>`. Widening is backwards compatible — an implementation
+  taking fewer parameters still satisfies it.
+
 ## [0.6.2] - 2026-08-10
 
 ### Added

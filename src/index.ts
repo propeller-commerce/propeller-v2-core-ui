@@ -23,6 +23,7 @@ export {
   formatDate,
   formatSurcharge,
   calcDiscountPercent,
+  localeForLanguage,
 } from './utils/formatting';
 export {
   getStockStatus,
