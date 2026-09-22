@@ -4,6 +4,33 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.8.0] - 2026-09-22
+
+### Changed
+
+- **`getLabel` keeps an intentionally empty label** instead of falling back.
+  It resolved `labels?.[key] || fallback`, so `""` — the normal way to hide a
+  label — was replaced by the English default and a label could not be blanked.
+  Now `??`, so only a genuinely absent key falls back.
+
+  This was live: `AccountIconAndMenu` requests `loginSubtitle` at two sites,
+  one with an empty fallback and one with `'Login to access your account'`.
+  nextDemo sets `loginSubtitle: ""` in both `en` and `nl`, so the blanking
+  worked at the first site and was silently discarded at the second — showing
+  English in the Dutch UI.
+
+  A locale that relied on `""` meaning "use the English default" will now
+  render an empty string. Remove the key instead to get the fallback.
+
+### Added
+
+- **`getLabel` warns on a missing key in development** (`NODE_ENV === 'development'`,
+  once per key). The fallbacks are English, so a key absent from a shipped
+  locale renders English inside an otherwise translated page and reads as a
+  translation rather than a gap. Two live examples found this way:
+  `totalExclVat` missing from the `CartIconAndSidebar` namespace, and
+  `closeFilters` missing from every namespace. (PWP-987)
+
 ## [0.7.0] - 2026-08-26
 
 ### Added

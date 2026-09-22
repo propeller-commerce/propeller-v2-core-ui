@@ -17,8 +17,10 @@ describe('getLabel', () => {
     expect(getLabel(undefined, 'addToCart', 'Add to cart')).toBe('Add to cart');
   });
 
-  it('returns the fallback when the key maps to an empty string', () => {
-    expect(getLabel({ addToCart: '' }, 'addToCart', 'Add to cart')).toBe('Add to cart');
+  it('keeps an intentionally empty label rather than falling back', () => {
+    // Blanking a label is the supported way to hide it. `||` used to send this
+    // to the English fallback, so a label could not be blanked.
+    expect(getLabel({ addToCart: '' }, 'addToCart', 'Add to cart')).toBe('');
   });
 
   it('returns the fallback for an empty labels object', () => {
