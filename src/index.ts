@@ -60,6 +60,11 @@ export {
 export { isEmbeddable, normalizeVideoUrl } from './utils/videoTransform';
 export { isContentHidden } from './utils/visibilityHelpers';
 export {
+  findPurchaserPac,
+  isOverAuthorizationLimit,
+  isCheckoutAllowed,
+} from './utils/purchaseAuthorization';
+export {
   buildProductJsonLd,
   buildClusterJsonLd,
   buildItemListJsonLd,

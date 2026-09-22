@@ -24,6 +24,20 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ### Added
 
+- **`isOverAuthorizationLimit(user, companyId, cart)`**, its inverse
+  **`isCheckoutAllowed`**, and **`findPurchaserPac`** — the B2B
+  purchase-authorization predicate as plain functions, so an app can gate its
+  own checkout button on the same rule the library's `CartSummary` uses instead
+  of reimplementing it. It previously existed only as a boolean on `useCart`,
+  reachable only by mounting the hook, and had drifted into three divergent
+  copies inside `propeller-v2-react-ui`.
+
+  `cart` is a required argument rather than ambient state: the hook's version
+  read its own internal cart, which is null until the consumer calls
+  `addItem`/`resolveCart`, so it answered "checkout allowed" for an over-limit
+  cart wherever the caller had loaded the cart itself. `CartSummary` carried a
+  comment explaining it avoided the hook for exactly that reason. (PWP-988)
+
 - **`getLabel` warns on a missing key in development** (`NODE_ENV === 'development'`,
   once per key). The fallbacks are English, so a key absent from a shipped
   locale renders English inside an otherwise translated page and reads as a
