@@ -61,6 +61,38 @@ describe('isOverAuthorizationLimit', () => {
   });
 });
 
+describe('underscored SDK shapes', () => {
+  // The SDK can serialize class instances with leading underscores on private
+  // fields. A plain read finds nothing and reports every cart as within limit.
+  const underscored = {
+    contactId: 19,
+    _purchaseAuthorizationConfigs: {
+      _items: [
+        { _purchaseRole: 'PURCHASER', _authorizationLimit: 500, _company: { _companyId: 11 } },
+      ],
+    },
+  } as never;
+
+  it('finds a PAC on a fully underscored user', () => {
+    expect(findPurchaserPac(underscored, 11)).toBeDefined();
+  });
+
+  it('enforces the limit on an underscored user and cart', () => {
+    expect(isOverAuthorizationLimit(underscored, 11, { _total: { _totalGross: 600 } } as never)).toBe(true);
+    expect(isOverAuthorizationLimit(underscored, 11, { _total: { _totalGross: 400 } } as never)).toBe(false);
+  });
+
+  it('handles a mixed shape', () => {
+    const mixed = {
+      contactId: 19,
+      purchaseAuthorizationConfigs: {
+        items: [{ purchaseRole: 'PURCHASER', _authorizationLimit: 500, company: { _companyId: 11 } }],
+      },
+    } as never;
+    expect(isOverAuthorizationLimit(mixed, 11, cart(600))).toBe(true);
+  });
+});
+
 describe('isCheckoutAllowed', () => {
   it('is the inverse, and blocks an over-limit cart', () => {
     expect(isCheckoutAllowed(contact(500), 11, cart(600))).toBe(false);

@@ -15,6 +15,20 @@ interface PacLike {
 const PURCHASER = 'PURCHASER';
 
 /**
+ * Read a field that may arrive under its own name or underscore-prefixed.
+ *
+ * The SDK can serialize class instances with leading underscores on private
+ * fields. Hosts normally sanitize on login, but any path that bypasses that —
+ * or stale storage from a previous session — leaves the underscored shape, and
+ * a plain read then silently finds nothing.
+ */
+function field<T>(source: unknown, name: string): T | undefined {
+  if (!source || typeof source !== 'object') return undefined;
+  const bag = source as Record<string, unknown>;
+  return (bag[name] ?? bag[`_${name}`]) as T | undefined;
+}
+
+/**
  * The PURCHASER purchase-authorization config that applies to a contact
  * acting for a company, or `undefined` when there is none.
  *
@@ -26,11 +40,13 @@ export function findPurchaserPac(
   companyId: number | string | null | undefined
 ): PacLike | undefined {
   if (!user || !('contactId' in user) || companyId == null) return undefined;
-  const items = ((user as Contact).purchaseAuthorizationConfigs?.items ?? []) as PacLike[];
-  return items.find(
-    (pac) =>
-      pac?.purchaseRole === PURCHASER && Number(pac?.company?.companyId) === Number(companyId)
-  );
+  const configs = field<{ items?: PacLike[] }>(user, 'purchaseAuthorizationConfigs');
+  const items = field<PacLike[]>(configs, 'items') ?? [];
+  return items.find((pac) => {
+    if (field<string>(pac, 'purchaseRole') !== PURCHASER) return false;
+    const company = field<Record<string, unknown>>(pac, 'company');
+    return Number(field<number | string>(company, 'companyId')) === Number(companyId);
+  });
 }
 
 /**
@@ -53,7 +69,10 @@ export function isOverAuthorizationLimit(
   if (!cart) return false;
   const pac = findPurchaserPac(user, companyId);
   if (!pac) return false;
-  return (cart.total?.totalGross ?? 0) > (pac.authorizationLimit ?? 0);
+  const limit = field<number>(pac, 'authorizationLimit') ?? 0;
+  const total = field<Record<string, unknown>>(cart, 'total');
+  const totalGross = field<number>(total, 'totalGross') ?? 0;
+  return totalGross > limit;
 }
 
 /** Inverse of {@link isOverAuthorizationLimit} — reads better at a checkout gate. */
