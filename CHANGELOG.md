@@ -38,6 +38,14 @@ All notable changes to `propeller-v2-core-ui` are documented here.
   cart wherever the caller had loaded the cart itself. `CartSummary` carried a
   comment explaining it avoided the hook for exactly that reason. (PWP-988)
 
+  Reads both plain and underscore-prefixed field shapes (`_authorizationLimit`,
+  `_company`, `_items`, …). The SDK can serialize class instances with leading
+  underscores on private fields; hosts normally sanitize on login, but any path
+  that bypasses that — or stale storage from a previous session — leaves the
+  underscored shape, and a plain read silently finds no config and reports every
+  cart as within limit. The Vue package had carried hand-rolled tolerant lookups
+  for this; they are now in one place and cover React too.
+
 - **`getLabel` warns on a missing key in development** (`NODE_ENV === 'development'`,
   once per key). The fallbacks are English, so a key absent from a shipped
   locale renders English inside an otherwise translated page and reads as a
