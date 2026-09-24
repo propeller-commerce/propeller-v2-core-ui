@@ -144,12 +144,31 @@ if (mode === 'b2b') showCompanySwitcher();
 ## Visibility
 
 ```ts
-isContentHidden(portalMode: PortalMode, user: AnyUser | null): boolean
+isContentHidden(
+  portalMode: PortalMode,
+  user: AnyUser | null,
+  isAuthenticated?: boolean,
+): boolean
 ```
 
 Implements the [portal-mode rules](/getting-started#portal-modes) for
 when to hide entire route trees (prices, account, catalog) from
 anonymous visitors. Used by every catalog component and the page guards.
+
+`isAuthenticated` closes a hydration window. Hosts paint from a thin cached
+hint before the full profile arrives, so `user` is `null` for an authenticated
+visitor for the first frames — without the flag, a signed-in shopper sees the
+log-in call to action and blanked prices until `getViewer()` resolves. Note the
+host's own `isLoading` is already `false` by then, so it cannot serve this
+purpose; the signal has to be "a session exists".
+
+It is optional, and omitting it keeps the previous behaviour — server renders,
+which have no such window, pass two arguments as before.
+
+```ts
+// Host bridge: feed it alongside `user`.
+<PropellerProvider user={state.user} isAuthenticated={state.isAuthenticated} … />
+```
 
 ## Video URL normalisation
 
