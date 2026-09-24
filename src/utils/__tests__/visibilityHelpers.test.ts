@@ -31,4 +31,26 @@ describe('isContentHidden', () => {
     expect(isContentHidden('Semi-Closed', null)).toBe(false);
     expect(isContentHidden('semiclosed', null)).toBe(false);
   });
+
+  describe('auth hydration window', () => {
+    // Hosts paint from a thin cached hint before the full profile arrives, so
+    // `user` is null for an authenticated visitor for the first frames.
+    it('does not hide from an authenticated viewer whose profile is still loading', () => {
+      expect(isContentHidden('semi-closed', null, true)).toBe(false);
+    });
+
+    it('still hides from a genuinely anonymous viewer', () => {
+      expect(isContentHidden('semi-closed', null, false)).toBe(true);
+    });
+
+    it('omitting the flag preserves the previous behaviour', () => {
+      expect(isContentHidden('semi-closed', null)).toBe(true);
+    });
+
+    it('a resolved user is never hidden, flag or not', () => {
+      const user = { contactId: 1 } as never;
+      expect(isContentHidden('semi-closed', user, false)).toBe(false);
+      expect(isContentHidden('semi-closed', user, true)).toBe(false);
+    });
+  });
 });

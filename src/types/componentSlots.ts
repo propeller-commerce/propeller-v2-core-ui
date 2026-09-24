@@ -68,6 +68,19 @@ export interface AddToCartComponentProps {
   afterAddToCart?: (cart: Cart, item?: CartMainItem) => void;
   onProceedToCheckout?: () => void;
   onRequestQuoteClick?: (cart: Cart) => void;
+  /**
+   * If true a new cart is created when no cart id is available.
+   * Defaults to false — and with no cart id, an add then fails outright, so a
+   * slot component serving anonymous visitors needs this.
+   */
+  createCart?: boolean;
+  /**
+   * Called when a new cart is created, so the host can persist `cart.cartId`.
+   * WARNING: without it the component creates a new cart on every add.
+   */
+  onCartCreated?: (cart: Cart) => void;
+  /** Tax basis for any price the block renders, so it matches the page. */
+  includeTax?: boolean;
   labels?: Record<string, string>;
   className?: string;
 }

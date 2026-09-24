@@ -4,6 +4,24 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.9.0] - 2026-09-24
+
+### Added
+
+- **`isContentHidden` takes an optional `isAuthenticated`.** Hosts paint from a
+  cached hint before the full profile arrives, so `user` is null for an
+  authenticated visitor for the first frames and semi-closed surfaces flashed
+  their logged-out state: a signed-in shopper saw the log-in call to action and
+  blanked prices until `getViewer()` resolved. The host’s own `isLoading` is
+  already false by then, so it cannot serve this purpose. Omitting the argument
+  keeps the previous behaviour, so server renders need no change. (PWP-989)
+- **`AddToCartComponentProps` gains `createCart`, `onCartCreated` and
+  `includeTax`.** The first two decide whether a cart exists at all: with no
+  `cartId` and `createCart` defaulting to false an add fails outright, so a slot
+  component written against the public contract could not serve an anonymous
+  visitor — the click did nothing. All optional, so existing implementors are
+  unaffected. (PWP-986)
+
 ## [0.8.0] - 2026-09-22
 
 ### Changed

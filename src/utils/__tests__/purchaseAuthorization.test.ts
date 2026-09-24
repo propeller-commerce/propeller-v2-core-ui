@@ -99,3 +99,29 @@ describe('isCheckoutAllowed', () => {
     expect(isCheckoutAllowed(contact(500), 11, cart(400))).toBe(true);
   });
 });
+
+describe('the fail-open the hook used to have', () => {
+  // useCart reported `checkoutAllowed: true` when its own cart was null, which
+  // it is until the consumer mutates. An app gating its checkout button on it
+  // let an over-limit purchaser through while the library UI showed "Request
+  // authorization". The predicate cannot see a cart it was not given, so the
+  // hook now fails closed while one is loading; this pins the contract the
+  // hook relies on.
+  it('reports not-over for a missing cart, so callers must gate on having one', () => {
+    expect(isOverAuthorizationLimit(contact(50), 11, null)).toBe(false);
+    expect(isCheckoutAllowed(contact(50), 11, null)).toBe(true);
+  });
+
+  it('blocks once the cart is present', () => {
+    expect(isCheckoutAllowed(contact(50), 11, cart(158))).toBe(false);
+  });
+
+  it('finds the config via the contact default when no company is passed', () => {
+    // The hook passed its raw `companyId` option, which is undefined for a
+    // contact acting for their own company — no config matched and every cart
+    // read as within limit.
+    const c = contact(50, 11);
+    expect(findPurchaserPac(c, undefined)).toBeUndefined();
+    expect(findPurchaserPac(c, (c as never as { company: { companyId: number } }).company?.companyId ?? 11)).toBeDefined();
+  });
+});
