@@ -4,6 +4,24 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.10.0] - 2026-10-02
+
+### Added
+
+- **`ImgComponentProps` — a contract for replacing the low-level `<img>`.**
+  `ImageComponentProps` receives a `product` / `cluster` and resolves the URL
+  itself, so it only fits surfaces that still hold the whole entity. Most image
+  sites have already resolved a URL string by render time — cart rows,
+  galleries, autosuggest, bundles — and could not use it, leaving a bare
+  `<img src="https://media.…">` as the only option. Those images are fetched
+  straight from the media CDN, which sends no `X-Robots-Tag` and serves no
+  `robots.txt`, so they sit outside the storefront’s crawler directives and
+  get no framework-level image optimisation. Keyed on `src`/`alt` so a host can
+  route every image through a framework-native component. Additive — existing
+  `imageComponent` implementors are unaffected. (PWP-1001)
+
+---
+
 ## [0.9.0] - 2026-09-24
 
 ### Added

@@ -4,6 +4,7 @@ import type {
   StockComponentProps,
   AddToCartComponentProps,
   ImageComponentProps,
+  ImgComponentProps,
   BadgesComponentProps,
   FavoriteComponentProps,
   ProductBundlesComponentProps,
@@ -48,6 +49,20 @@ describe('componentSlots contracts', () => {
     const a: ImageComponentProps = {};
     const b: ImageComponentProps = { className: 'x' };
     expect([a, b]).toBeDefined();
+  });
+
+  it('ImgComponentProps requires `src` and `alt`', () => {
+    const props: ImgComponentProps = { src: 'https://cdn/x.webp', alt: 'x' };
+    expect(props.src).toBe('https://cdn/x.webp');
+    // Both are required — an empty object must not satisfy the type.
+    // @ts-expect-error — `src` and `alt` are required.
+    const invalid: ImgComponentProps = {};
+    expect(invalid).toBeDefined();
+  });
+
+  it('ImgComponentProps accepts an empty alt for decorative images', () => {
+    const props: ImgComponentProps = { src: 'https://cdn/x.webp', alt: '' };
+    expect(props.alt).toBe('');
   });
 
   it('BadgesComponentProps allows product or cluster (both optional)', () => {

@@ -133,6 +133,7 @@ export type {
   StockComponentProps,
   AddToCartComponentProps,
   ImageComponentProps,
+  ImgComponentProps,
   BadgesComponentProps,
   FavoriteComponentProps,
   ProductBundlesComponentProps,

@@ -100,6 +100,18 @@ export interface ImageComponentProps {
   className?: string;
 }
 
+/** Contract for an injected low-level `<img>` replacement, keyed on `src`. */
+export interface ImgComponentProps {
+  src: string;
+  /** `''` for decorative images; always emitted. */
+  alt: string;
+  className?: string;
+  width?: number;
+  height?: number;
+  loading?: 'lazy' | 'eager';
+  onClick?: (event: unknown) => void;
+}
+
 /** Contract for an injected badges block. */
 export interface BadgesComponentProps {
   product?: Product;
