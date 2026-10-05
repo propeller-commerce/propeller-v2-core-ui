@@ -6,6 +6,7 @@ import {
   getProductSku,
   getClusterSku,
   getLocalizedValue,
+  resolveOrderableQuantity,
 } from '../productHelpers';
 
 const productWithImage = {
@@ -118,5 +119,46 @@ describe('getLocalizedValue', () => {
 
   it('returns the fallback when the first entry has no value', () => {
     expect(getLocalizedValue([{ language: 'NL' }], undefined, 'n/a')).toBe('n/a');
+  });
+});
+
+describe('resolveOrderableQuantity', () => {
+  it('floors at the minimum', () => {
+    expect(resolveOrderableQuantity(1, 2, 1)).toBe(2);
+    expect(resolveOrderableQuantity(0, 5, 5)).toBe(5);
+    expect(resolveOrderableQuantity(-3, 1, 1)).toBe(1);
+  });
+
+  // min 2, step 6 -> 2, 8, 14, 20
+  it('lands on the min + n*step grid', () => {
+    expect(resolveOrderableQuantity(8, 2, 6)).toBe(8);
+    expect(resolveOrderableQuantity(14, 2, 6)).toBe(14);
+  });
+
+  it('rounds to the nearest grid point, not down', () => {
+    expect(resolveOrderableQuantity(6, 2, 6)).toBe(8);
+    expect(resolveOrderableQuantity(4, 2, 6)).toBe(2);
+  });
+
+  it('is a no-op for step 1', () => {
+    expect(resolveOrderableQuantity(7, 1, 1)).toBe(7);
+  });
+
+  // A zero or absent step must not divide by zero.
+  it('treats a zero step as 1', () => {
+    expect(resolveOrderableQuantity(7, 1, 0)).toBe(7);
+  });
+
+  // The field can be cleared while typing; NaN must resolve to the minimum.
+  it('resolves a non-number to the minimum', () => {
+    expect(resolveOrderableQuantity(NaN, 3, 2)).toBe(3);
+    expect(resolveOrderableQuantity(Infinity, 3, 2)).toBe(3);
+  });
+
+  // A cart line already off the grid: min 2, step 3 -> 2, 5, 8, 11
+  it('returns an off-grid cart quantity to the grid', () => {
+    expect(resolveOrderableQuantity(9, 2, 3)).toBe(8);
+    expect(resolveOrderableQuantity(10, 2, 3)).toBe(11);
+    expect(resolveOrderableQuantity(4, 2, 3)).toBe(5);
   });
 });

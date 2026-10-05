@@ -44,6 +44,7 @@ export {
   getProductSku,
   getClusterSku,
   getLocalizedValue,
+  resolveOrderableQuantity,
 } from './utils/productHelpers';
 export { stripHtml, shouldTruncate, truncateAt } from './utils/truncation';
 export {

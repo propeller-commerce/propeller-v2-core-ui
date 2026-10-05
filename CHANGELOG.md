@@ -4,6 +4,23 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.11.0] - 2026-10-05
+
+### Added
+
+- **`resolveOrderableQuantity(value, min, step)` — the order quantity grid.**
+  Resolves a requested quantity to one the customer may actually order: at
+  least `min`, on the `min + n*step` grid, rounded to the nearest point. A zero
+  or absent step means any quantity at or above `min` is orderable, and a
+  non-finite value (a cleared input) resolves to `min`. The rule existed in
+  five places — `AddToCart` and `QuickOrder` in both packages, plus twice
+  inline in `CartItem`'s markup — and the copies had drifted: the `CartItem`
+  ones divided by an unguarded step and rejected a cleared field, so a cart
+  line could sit off the grid and a typed quantity could not be corrected.
+  Every caller now shares this one implementation.
+
+---
+
 ## [0.10.0] - 2026-10-02
 
 ### Added

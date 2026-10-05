@@ -24,3 +24,14 @@ export function getLocalizedValue(
 ): string {
   return getLanguageString(items as any, language || 'NL', fallback);
 }
+
+/**
+ * Resolve a requested quantity to one the customer may actually order: at
+ * least `min`, on the `min + n*step` grid, rounded to the nearest point.
+ * A zero/absent step means every quantity at or above `min` is orderable; a
+ * non-finite value (a cleared input) resolves to `min`.
+ */
+export function resolveOrderableQuantity(value: number, min: number, step: number): number {
+  if (!Number.isFinite(value) || value <= min) return min;
+  return Math.round((value - min) / (step || 1)) * (step || 1) + min;
+}
