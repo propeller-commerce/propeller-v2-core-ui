@@ -35,3 +35,17 @@ export function resolveOrderableQuantity(value: number, min: number, step: numbe
   if (!Number.isFinite(value) || value <= min) return min;
   return Math.round((value - min) / (step || 1)) * (step || 1) + min;
 }
+
+/** Next orderable quantity above `value` — always moves up. */
+export function incrementOrderableQuantity(value: number, min: number, step: number): number {
+  if (!Number.isFinite(value) || value < min) return min;
+  const s = step || 1;
+  return Math.floor((value - min) / s + 1) * s + min;
+}
+
+/** Next orderable quantity below `value`, never below `min` — always moves down. */
+export function decrementOrderableQuantity(value: number, min: number, step: number): number {
+  if (!Number.isFinite(value) || value <= min) return min;
+  const s = step || 1;
+  return Math.max(min, Math.ceil((value - min) / s - 1) * s + min);
+}

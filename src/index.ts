@@ -45,6 +45,8 @@ export {
   getClusterSku,
   getLocalizedValue,
   resolveOrderableQuantity,
+  incrementOrderableQuantity,
+  decrementOrderableQuantity,
 } from './utils/productHelpers';
 export { stripHtml, shouldTruncate, truncateAt } from './utils/truncation';
 export {

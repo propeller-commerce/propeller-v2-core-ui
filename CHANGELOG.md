@@ -4,6 +4,21 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.12.0] - 2026-10-13
+
+### Added
+
+- **`incrementOrderableQuantity` / `decrementOrderableQuantity` — directional
+  stepping on the order quantity grid.** `resolveOrderableQuantity` rounds to
+  the *nearest* grid point, which is right for a typed value on blur but wrong
+  for a stepper button: from a quantity already off the grid the nearest point
+  can lie in the opposite direction, so "+" could move down and "-" could move
+  up. With min 2 and step 3, "+" from 9 sent 8 and "-" from 10 sent 11. These
+  two helpers always move in the requested direction, snapping to the next grid
+  point above or below, and never go below `min`.
+
+---
+
 ## [0.11.0] - 2026-10-05
 
 ### Added

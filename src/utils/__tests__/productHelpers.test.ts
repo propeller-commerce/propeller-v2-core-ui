@@ -7,6 +7,8 @@ import {
   getClusterSku,
   getLocalizedValue,
   resolveOrderableQuantity,
+  incrementOrderableQuantity,
+  decrementOrderableQuantity,
 } from '../productHelpers';
 
 const productWithImage = {
@@ -160,5 +162,54 @@ describe('resolveOrderableQuantity', () => {
     expect(resolveOrderableQuantity(9, 2, 3)).toBe(8);
     expect(resolveOrderableQuantity(10, 2, 3)).toBe(11);
     expect(resolveOrderableQuantity(4, 2, 3)).toBe(5);
+  });
+});
+
+// min 2, step 3 -> 2, 5, 8, 11, 14
+describe('incrementOrderableQuantity', () => {
+  it('moves up one step from a grid value', () => {
+    expect(incrementOrderableQuantity(2, 2, 3)).toBe(5);
+    expect(incrementOrderableQuantity(5, 2, 3)).toBe(8);
+  });
+
+  // Rounding to the nearest grid point could move down; incrementing must not.
+  it('moves up from an off-grid value', () => {
+    expect(incrementOrderableQuantity(9, 2, 3)).toBe(11);
+    expect(incrementOrderableQuantity(10, 2, 3)).toBe(11);
+    expect(incrementOrderableQuantity(4, 2, 3)).toBe(5);
+  });
+
+  it('resolves a value below the minimum to the minimum', () => {
+    expect(incrementOrderableQuantity(1, 2, 3)).toBe(2);
+    expect(incrementOrderableQuantity(NaN, 3, 2)).toBe(3);
+  });
+
+  it('adds 1 for a step of 1 or 0', () => {
+    expect(incrementOrderableQuantity(7, 1, 1)).toBe(8);
+    expect(incrementOrderableQuantity(7, 1, 0)).toBe(8);
+  });
+});
+
+describe('decrementOrderableQuantity', () => {
+  it('moves down one step from a grid value', () => {
+    expect(decrementOrderableQuantity(8, 2, 3)).toBe(5);
+    expect(decrementOrderableQuantity(5, 2, 3)).toBe(2);
+  });
+
+  it('moves down from an off-grid value', () => {
+    expect(decrementOrderableQuantity(10, 2, 3)).toBe(8);
+    expect(decrementOrderableQuantity(9, 2, 3)).toBe(8);
+    expect(decrementOrderableQuantity(4, 2, 3)).toBe(2);
+  });
+
+  it('never goes below the minimum', () => {
+    expect(decrementOrderableQuantity(2, 2, 3)).toBe(2);
+    expect(decrementOrderableQuantity(3, 2, 3)).toBe(2);
+    expect(decrementOrderableQuantity(NaN, 3, 2)).toBe(3);
+  });
+
+  it('subtracts 1 for a step of 1 or 0', () => {
+    expect(decrementOrderableQuantity(7, 1, 1)).toBe(6);
+    expect(decrementOrderableQuantity(7, 1, 0)).toBe(6);
   });
 });
