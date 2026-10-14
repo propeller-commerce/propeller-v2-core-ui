@@ -4,6 +4,21 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.13.0] - 2026-10-14
+
+### Added
+
+- **`shouldHandlePaginationClick` / `paginationRel` — pagination as links.**
+  Grid pagination entries navigate to a different URL, so they are anchors with
+  a real `href` rather than buttons: that is what gives the status-bar preview,
+  open-in-new-tab and copy-link-address, and what makes a screen reader
+  announce a link instead of a button. A plain left click is still handled in
+  the client, so `shouldHandlePaginationClick` reports whether an event is the
+  plain click to take over or one the browser must keep — a modified or middle
+  click falls through untouched. `paginationRel` returns `prev`/`next` for the
+  adjacent entries only, since two elements claiming to be the previous
+  document would be wrong.
+
 ## [0.12.0] - 2026-10-13
 
 ### Added

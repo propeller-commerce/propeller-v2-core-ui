@@ -33,6 +33,11 @@ export {
 } from './utils/inventoryHelpers';
 export { getLabel } from './utils/labelHelpers';
 export {
+  shouldHandlePaginationClick,
+  paginationRel,
+  type PaginationClickEvent,
+} from './utils/paginationHelpers';
+export {
   resolveLanguageEntry,
   getLanguageString,
   getLanguageUri,
