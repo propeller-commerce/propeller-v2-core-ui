@@ -4,6 +4,22 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.13.1] - 2026-10-30
+
+### Changed
+
+- **Docs use the published package names (PWP-1087).** Install, import and
+  peer-dependency lines in the README and docs site now name
+  `@propeller-commerce/propeller-v2-core-ui` and
+  `@propeller-commerce/propeller-sdk-v2`, installed from npm, instead of the
+  unscoped names and `github:` URLs, which do not resolve.
+- **No unpublished CMS adapters in the `CmsAdapter` docs (PWP-1088).** The
+  contract page no longer points at adapter packages that are not on npm; it
+  says to write an adapter against the interface or start from the CMS
+  providers in the public Next and Vue boilerplates.
+- **Provider snippet matches the current React API (PWP-1086).** The
+  `isAuthenticated` example passes the scope through `<PropellerProvider value={…}>`.
+
 ## [0.13.0] - 2026-10-14
 
 ### Added

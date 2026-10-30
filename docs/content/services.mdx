@@ -15,8 +15,8 @@ keeps tests fast (you stub `services`, not the network).
 ## `createServices`
 
 ```ts
-import { createServices, type Services } from 'propeller-v2-core-ui';
-import { GraphQLClient } from 'propeller-sdk-v2';
+import { createServices, type Services } from '@propeller-commerce/propeller-v2-core-ui';
+import { GraphQLClient } from '@propeller-commerce/propeller-sdk-v2';
 
 const client = new GraphQLClient(API_URL, { headers: { ... } });
 const services: Services = createServices(client);

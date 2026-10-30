@@ -38,8 +38,8 @@ The package-wide convention is:
   it returns `{ ok: false, error }`. Callers branch on the discriminant.
 
 ```ts
-import type { Result } from 'propeller-v2-core-ui';
-import { ok, err, tryAsync } from 'propeller-v2-core-ui';
+import type { Result } from '@propeller-commerce/propeller-v2-core-ui';
+import { ok, err, tryAsync } from '@propeller-commerce/propeller-v2-core-ui';
 
 // Construct results explicitly
 const success = ok({ cartId: 'abc' });           // { ok: true, value: ... }
@@ -62,7 +62,7 @@ and the rules for when to throw vs return.
 The framework-agnostic interface every CMS adapter implements.
 
 ```ts
-import type { CmsAdapter, CmsPage, CmsBlock } from 'propeller-v2-core-ui';
+import type { CmsAdapter, CmsPage, CmsBlock } from '@propeller-commerce/propeller-v2-core-ui';
 
 interface CmsAdapter {
   getPage(slug: string, opts?: CmsFetchOptions): Promise<CmsPage | null>;
@@ -71,11 +71,15 @@ interface CmsAdapter {
 }
 ```
 
-Concrete implementations live in
-[`propeller-v2-accelerator`](https://propeller-commerce.github.io/propeller-v2-accelerator/)'s
-`cms-adapter-strapi` and `cms-adapter-cms` packages. Shop code wires the
-adapter into React or Vue via `propeller-v2-cms-react` /
-`propeller-v2-cms-vue`.
+There is no adapter package to install from npm. Write one against this
+interface for your CMS, or start from the CMS providers in the Propeller
+boilerplates: `lib/cms/providers` in the
+[Next boilerplate](https://github.com/propeller-commerce/propeller-v2-next-boilerplate)
+and `frontend/src/lib/cms/providers` in the
+[Vue boilerplate](https://github.com/propeller-commerce/propeller-v2-vue-boilerplate).
+Shop code wires the adapter into React or Vue via
+`@propeller-commerce/propeller-v2-cms-react` /
+`@propeller-commerce/propeller-v2-cms-vue`.
 
 Types:
 

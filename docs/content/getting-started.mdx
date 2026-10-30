@@ -5,26 +5,27 @@ sidebar_position: 2
 
 # Getting started
 
-`propeller-v2-core-ui` is a peer-dependency package. You install it
-alongside `propeller-sdk-v2` and one of the framework-specific UI packages
-(`propeller-v2-react-ui` or `propeller-v2-vue-ui`).
+`@propeller-commerce/propeller-v2-core-ui` is a peer-dependency package. You
+install it alongside `@propeller-commerce/propeller-sdk-v2` and one of the
+framework-specific UI packages (`@propeller-commerce/propeller-v2-react-ui` or
+`@propeller-commerce/propeller-v2-vue-ui`).
 
 ## Install
 
 ```bash
-# from the GitHub master branch
-npm install github:propeller-commerce/propeller-v2-core-ui#master
+npm install @propeller-commerce/propeller-v2-core-ui
 ```
 
 Peer dependency:
 
 ```bash
-npm install github:propeller-commerce/propeller-sdk-v2#master
+npm install @propeller-commerce/propeller-sdk-v2
 ```
 
 Most consumers do **not** install core-ui directly — it is brought in
-transitively by `propeller-v2-react-ui` / `propeller-v2-vue-ui` /
-`propeller-v2-cms-{react,vue}`. Install it directly only when:
+transitively by `@propeller-commerce/propeller-v2-react-ui` /
+`@propeller-commerce/propeller-v2-vue-ui` /
+`@propeller-commerce/propeller-v2-cms-{react,vue}`. Install it directly only when:
 
 - You're authoring a *new* framework-agnostic helper that lives in
   core-ui itself.
@@ -54,8 +55,8 @@ client at the consumer root and pass the returned `services` object down
 through your framework's context:
 
 ```ts
-import { createServices } from 'propeller-v2-core-ui';
-import { GraphQLClient } from 'propeller-sdk-v2';
+import { createServices } from '@propeller-commerce/propeller-v2-core-ui';
+import { GraphQLClient } from '@propeller-commerce/propeller-sdk-v2';
 
 const client = new GraphQLClient(process.env.PROPELLER_API_URL);
 const services = createServices(client);

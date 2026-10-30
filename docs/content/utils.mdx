@@ -10,7 +10,7 @@ constant — no classes, no module-scoped state — so each one is trivially
 tree-shakeable. Import what you need from the package root:
 
 ```ts
-import { formatPrice, isContact, deriveUserMode } from 'propeller-v2-core-ui';
+import { formatPrice, isContact, deriveUserMode } from '@propeller-commerce/propeller-v2-core-ui';
 ```
 
 ## Formatting
@@ -167,7 +167,7 @@ which have no such window, pass two arguments as before.
 
 ```ts
 // Host bridge: feed it alongside `user`.
-<PropellerProvider user={state.user} isAuthenticated={state.isAuthenticated} … />
+<PropellerProvider value={{ user: state.user, isAuthenticated: state.isAuthenticated, … }}>
 ```
 
 ## Video URL normalisation

@@ -1,9 +1,8 @@
 /**
  * CMS adapter contract — framework-agnostic.
  *
- * Adapter packages (e.g. propeller-cms-adapter-strapi) implement CmsAdapter
- * against a specific CMS backend. Consumers receive an adapter via
- * PropellerProvider's `cms` prop and call it from server-side data fetchers
+ * Shops implement CmsAdapter against a specific CMS backend, wire it in via
+ * the cms-react / cms-vue CmsAdapterProvider, and call it from server-side data fetchers
  * (RSC, getServerSideProps, Vite SSR entry) — never from interactive
  * components directly.
  *

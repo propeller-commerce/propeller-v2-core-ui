@@ -24,10 +24,10 @@ mutations. Reads throw; writes return `Result`.
 ## Install
 
 ```bash
-npm install github:propeller-commerce/propeller-v2-core-ui#master
+npm install @propeller-commerce/propeller-v2-core-ui
 ```
 
-Peer dep: `propeller-sdk-v2`.
+Peer dep: `@propeller-commerce/propeller-sdk-v2`.
 
 ## Build
 

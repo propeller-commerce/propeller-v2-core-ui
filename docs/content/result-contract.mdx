@@ -28,7 +28,7 @@ type Result<T, E = Error> =
 Constructors:
 
 ```ts
-import { ok, err, tryAsync } from 'propeller-v2-core-ui';
+import { ok, err, tryAsync } from '@propeller-commerce/propeller-v2-core-ui';
 
 ok({ cartId: 'abc' });              // { ok: true,  value: ... }
 err(new Error('Out of stock'));      // { ok: false, error: ... }
