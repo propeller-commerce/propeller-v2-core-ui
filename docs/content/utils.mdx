@@ -154,6 +154,9 @@ isContentHidden(
 Implements the [portal-mode rules](/getting-started#portal-modes) for
 when to hide entire route trees (prices, account, catalog) from
 anonymous visitors. Used by every catalog component and the page guards.
+Returns `true` for an anonymous viewer in a `'semi-closed'` **or** `'closed'`
+portal (a closed portal also gates its routes; this covers whatever it still
+renders for a guest).
 
 `isAuthenticated` closes a hydration window. Hosts paint from a thin cached
 hint before the full profile arrives, so `user` is `null` for an authenticated
@@ -191,8 +194,10 @@ safeJsonStringify(value): string
 ```
 
 Generate schema.org JSON-LD for product, cluster, and item-list pages.
-`safeJsonStringify` escapes `</script>` runs so the result is safe to
-embed in an inline `<script type="application/ld+json">`.
+`safeJsonStringify` escapes `<`, `>`, `&`, U+2028 and U+2029 as JSON
+`\u` escapes, so catalog text can't close the tag (`</script>`) or open a
+comment (`<!--`); the result is safe to embed in an inline
+`<script type="application/ld+json">` and still parses to the same value.
 
 ## Countries
 

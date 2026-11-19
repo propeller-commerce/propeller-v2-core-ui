@@ -1,7 +1,10 @@
 import type { Contact, Customer } from '@propeller-commerce/propeller-sdk-v2';
 
 /**
- * Whether semi-closed content should be hidden from this viewer.
+ * Whether prices / ordering should be hidden from this viewer: true for an
+ * anonymous viewer in a `semi-closed` or `closed` portal. A closed portal also
+ * gates its routes, but anything it still renders for a guest (login page,
+ * error page, a route the host forgot to gate) must not show prices either.
  *
  * `isAuthenticated` closes a hydration window: hosts paint from a thin cached
  * hint before the full profile arrives, so `user` is null for an authenticated
@@ -17,5 +20,5 @@ export function isContentHidden(
   user: Contact | Customer | null | undefined,
   isAuthenticated?: boolean
 ): boolean {
-  return portalMode === 'semi-closed' && !user && !isAuthenticated;
+  return (portalMode === 'semi-closed' || portalMode === 'closed') && !user && !isAuthenticated;
 }

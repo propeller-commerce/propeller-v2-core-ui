@@ -11,7 +11,7 @@
  *     (`Price.net` is the source of truth; `gross` is derived from it + tax
  *     zone) and the legacy PHP shop's behaviour.
  *   - Offers are OMITTED when `isContentHidden(portalMode, user)` returns true
- *     (semi-closed portals must not leak prices to anonymous visitors / bots).
+ *     (semi-closed and closed portals must not leak prices to anonymous visitors / bots).
  *   - Clusters emit `"@type": "Product"` — schema.org has no `Cluster` type.
  *     The legacy PHP shop emits `"@type": "Cluster"`, which is non-standard
  *     and ignored by Google. Don't "fix" this back.
@@ -43,7 +43,7 @@ export interface JsonLdContext {
   language: string;
   /** ISO 4217 currency code for offers, e.g. `'EUR'`. Source: `config.currencyCode`. */
   currencyCode: string;
-  /** Portal mode — when `'semi-closed'` AND no user, `offers` is omitted. */
+  /** Portal mode — when `'semi-closed'` or `'closed'` AND no user, `offers` is omitted. */
   portalMode: string;
   /** Current user (anonymous when null). Decides offer visibility. */
   user: Contact | Customer | null | undefined;
@@ -55,18 +55,22 @@ export interface JsonLdContext {
 }
 
 /**
- * JSON.stringify wrapper that escapes the `</` sequence so the payload can't
- * accidentally close the surrounding `<script>` tag. Cheap insurance — any
- * description containing the literal text `</script>` would otherwise break
- * the page (and serve as a vector for HTML injection from catalog data).
+ * JSON.stringify for an inline `<script>` block. Escapes `<`, `>` and `&` as
+ * `\u003c` / `\u003e` / `\u0026`, so catalog text can't close the tag
+ * (`</script>`) or open an HTML comment (`<!--`), and U+2028 / U+2029, which
+ * end a line in older JavaScript parsers. The result is still valid JSON that
+ * parses back to the same value.
  */
 export function safeJsonStringify(value: unknown): string {
-  return JSON.stringify(value).replace(/<\//g, '<\\/');
+  return JSON.stringify(value).replace(
+    /[<>&\u2028\u2029]/g,
+    (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`
+  );
 }
 
 /**
  * Returns `true` when the JSON-LD `offers` block should be included for this
- * viewer. Semi-closed portals hide prices from anonymous visitors; we mirror
+ * viewer. Semi-closed and closed portals hide prices from anonymous visitors; we mirror
  * that gate so crawlers don't index a price the same anonymous user can't see
  * on the page itself.
  */

@@ -19,15 +19,18 @@ describe('isContentHidden', () => {
     expect(isContentHidden('open', someUser)).toBe(false);
   });
 
-  it('never hides content in closed mode (closed gates at the route level, not here)', () => {
-    expect(isContentHidden('closed', null)).toBe(false);
+  it('hides content in closed mode for an anonymous visitor, not for a logged-in one', () => {
+    expect(isContentHidden('closed', null)).toBe(true);
+    expect(isContentHidden('closed', undefined, false)).toBe(true);
+    expect(isContentHidden('closed', someUser)).toBe(false);
+    expect(isContentHidden('closed', null, true)).toBe(false);
   });
 
   it('does not hide content when portalMode is undefined', () => {
     expect(isContentHidden(undefined, null)).toBe(false);
   });
 
-  it('only the exact string "semi-closed" triggers hiding', () => {
+  it('only the exact strings "semi-closed" / "closed" trigger hiding', () => {
     expect(isContentHidden('Semi-Closed', null)).toBe(false);
     expect(isContentHidden('semiclosed', null)).toBe(false);
   });

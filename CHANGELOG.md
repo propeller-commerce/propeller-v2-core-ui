@@ -4,6 +4,21 @@ All notable changes to `propeller-v2-core-ui` are documented here.
 
 ---
 
+## [0.13.2] - 2026-11-19
+
+### Security
+
+- **`isContentHidden` also hides in `closed` portals** (security review #4).
+  It returned `true` only for `portalMode === 'semi-closed'` and no user, so in
+  a `closed` portal every catalog component and the JSON-LD `offers` block
+  showed prices to anonymous visitors on any page the route guard let through.
+  It now returns `true` for an anonymous viewer in `'semi-closed'` or
+  `'closed'`; `open` is unchanged and a signed-in viewer (or
+  `isAuthenticated`) still sees everything.
+- **`safeJsonStringify` escapes `<`, `>`, `&`, U+2028 and U+2029** as JSON
+  unicode escapes. It only escaped `</`, so `<!--` in catalog text reached the
+  inline JSON-LD `<script>` unescaped. Output still parses to the same value.
+
 ## [0.13.1] - 2026-10-30
 
 ### Changed
